@@ -137,6 +137,12 @@ public class Asteroid : MonoBehaviour
 
     }
 
+    void OnCollisionEnter2D(Collision2D c)
+    {
+        Destroy(gameObject);
+        GameObject.Find("GameController").GetComponent<GameController>().AddScore(20);        
+    }
+
     void CreateLineMaterial()
     {
         if (!line_material_)

@@ -11,9 +11,18 @@ public class PlayerShip : MonoBehaviour
     public Rigidbody2D rigid_body_;
     public Projectile projectile_;
 
+    private bool is_alive_;
+
+
     // Use this for initialization
     void Start()
-    {
+    {        
+        is_alive_ = true;        
+    }
+
+    public bool IsPlayerAlive()
+    {       
+        return is_alive_;
     }
 
     // Update is called once per frame
@@ -40,5 +49,15 @@ public class PlayerShip : MonoBehaviour
             rigid_body_.velocity = curr_velocity.normalized * max_velocity_;
         }
     }
+
+    void OnCollisionEnter2D(Collision2D c)
+    {        
+        if (c.gameObject.tag == "Asteroid")
+        {         
+            is_alive_ = false;
+        }
+    }
+
+    
 
 }

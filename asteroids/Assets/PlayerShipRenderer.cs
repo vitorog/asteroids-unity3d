@@ -25,7 +25,7 @@ public class PlayerShipRenderer : MonoBehaviour
         vertices_.Add(p4);
         vertices_.Add(p5);
 
-        line_color_ = new Color(1.0f, 1.0f, 1.0f, 0.5f);
+        line_color_ = new Color(1.0f, 1.0f, 1.0f, 1.0f);
         square_color_ = new Color(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
@@ -63,7 +63,7 @@ public class PlayerShipRenderer : MonoBehaviour
         Matrix4x4 trs_matrix = Matrix4x4.TRS(transform.position, transform.rotation, transform.localScale);
         GL.MultMatrix(trs_matrix);
         DrawLines();
-        DrawSquares(0.1f);
+        //DrawSquares(0.1f);
         GL.PopMatrix();
     }
 
