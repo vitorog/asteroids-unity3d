@@ -13,11 +13,11 @@ public class PlayerShipRenderer : MonoBehaviour
     void Start()
     {
         CreateLineMaterial();
-        Vector3 p1 = new Vector3(-0.5f, -0.5f, 0.0f);
-        Vector3 p2 = new Vector3(0.0f, 0.5f, 0.0f);
-        Vector3 p3 = new Vector3(0.5f, -0.5f, 0.0f);
-        Vector3 p4 = new Vector3(0.25f, -0.25f, 0.0f);
-        Vector3 p5 = new Vector3(-0.25f, -0.25f, 0.0f);
+        Vector3 p1 = new Vector3(-1.0f, -1.0f, 0.0f);
+        Vector3 p2 = new Vector3(0.0f, 1.0f, 0.0f);
+        Vector3 p3 = new Vector3(1.0f, -1.0f, 0.0f);
+        Vector3 p4 = new Vector3(0.5f, -0.75f, 0.0f);
+        Vector3 p5 = new Vector3(-0.5f, -0.75f, 0.0f);
         vertices_ = new List<Vector3>();
         vertices_.Add(p1);
         vertices_.Add(p2);
@@ -63,7 +63,7 @@ public class PlayerShipRenderer : MonoBehaviour
         Matrix4x4 trs_matrix = Matrix4x4.TRS(transform.position, transform.rotation, transform.localScale);
         GL.MultMatrix(trs_matrix);
         DrawLines();
-        DrawSquares(0.02f);
+        DrawSquares(0.1f);
         GL.PopMatrix();
     }
 
