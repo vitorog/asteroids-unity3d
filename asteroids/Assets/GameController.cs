@@ -22,6 +22,7 @@ public class GameController : MonoBehaviour
     public float min_asteroid_speed_;
     public float max_asteroid_torque_;
     public float min_asteroid_torque_;
+    public float score_to_life_rate_;
 
     private GAME_STATE curr_state_;
     private int current_score_;
@@ -37,9 +38,9 @@ public class GameController : MonoBehaviour
         hud_player_lives_ = new List<GameObject>();
         for (int i = 0; i < num_lives_; i++)
         {
-            AddLife();
+            AddLifeHUD();
         }
-        curr_state_ = GAME_STATE.PLAYING;        
+        curr_state_ = GAME_STATE.PLAYING;
         GenerateAsteroid();
         GenerateAsteroid();
         GenerateAsteroid();
@@ -52,9 +53,10 @@ public class GameController : MonoBehaviour
     {
         current_score_ += score;
         score_text_.text = current_score_.ToString();
-        if (current_score_ % 10000 == 0)
+        if (current_score_ % score_to_life_rate_ == 0)
         {
-            AddLife();
+            num_lives_++;
+            AddLifeHUD();            
         }
     }
 
@@ -78,14 +80,14 @@ public class GameController : MonoBehaviour
         }
     }    
 
-    void AddLife()
+    void AddLifeHUD()
     {
         float shift = hud_player_lives_.Count * hud_life_distance_;
         GameObject hud_life = (GameObject)GameObject.Instantiate(hud_player_life_prefab_);
         Vector3 position = Camera.main.ViewportToWorldPoint(new Vector3(0.08f + shift, 0.9f, 0.0f));
         position.z = 0.0f;
         hud_life.transform.position = position;
-        hud_player_lives_.Add(hud_life);
+        hud_player_lives_.Add(hud_life);        
     }
 
     void OnPlayerDeath()
