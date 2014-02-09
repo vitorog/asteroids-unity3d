@@ -62,6 +62,7 @@ public class PlayerShipRenderer : MonoBehaviour
         GL.PushMatrix();
         Matrix4x4 trs_matrix = Matrix4x4.TRS(transform.position, transform.rotation, transform.localScale);
         GL.MultMatrix(trs_matrix);
+        //DrawBoundingBox();
         DrawLines();
         //DrawSquares(0.1f);
         GL.PopMatrix();
@@ -96,6 +97,27 @@ public class PlayerShipRenderer : MonoBehaviour
             GL.Vertex3(vertice.x + half_size, vertice.y + half_size, 0.0f);
             GL.Vertex3(vertice.x - half_size, vertice.y + half_size, 0.0f);
         }
+        GL.End();
+    }
+
+    void DrawBoundingBox()
+    {
+        BoxCollider2D bc = (BoxCollider2D)gameObject.GetComponent<BoxCollider2D>();
+
+        GL.Color(square_color_);
+        GL.Begin(GL.LINES);
+        GL.Vertex3(bc.center.x - bc.size.x / 2.0f, bc.center.y - bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.center.x + bc.size.x / 2.0f, bc.center.y - bc.size.y / 2.0f, 0.0f);
+
+        GL.Vertex3(bc.center.x + bc.size.x / 2.0f, bc.center.y - bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.center.x + bc.size.x / 2.0f, bc.center.y + bc.size.y / 2.0f, 0.0f);
+
+        GL.Vertex3(bc.center.x + bc.size.x / 2.0f, bc.center.y + bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.center.x - bc.size.x / 2.0f, bc.center.y + bc.size.y / 2.0f, 0.0f);
+
+        GL.Vertex3(bc.center.x - bc.size.x / 2.0f, bc.center.y + bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.center.x - bc.size.x / 2.0f, bc.center.y - bc.size.y / 2.0f, 0.0f);
+
         GL.End();
     }
 }

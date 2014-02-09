@@ -4,18 +4,37 @@ using System.Collections.Generic;
 
 public class Asteroid : MonoBehaviour
 {
-
+    public GameObject asteroid_prefab_;
     private Material line_material_;
     private List<Vector3> vertices_;
     private Color line_color_;
     private Color square_color_;
     private int type_;
+    private int size_ = 3; //3= Big, 2 = Medium, 1 = Small;
+
+
+    public void SetAsteroidSize(int size)
+    {
+        size_ = size;
+        switch (size_)
+        {
+            case 1:
+                transform.localScale = new Vector3(0.1f, 0.1f, 1.0f);
+                break;
+            case 2:
+                transform.localScale = new Vector3(0.25f, 0.25f, 1.0f);
+                break;
+            case 3:
+                transform.localScale = new Vector3(0.5f, 0.5f, 1.0f);
+                break;
+        }
+    }
 
     // Use this for initialization
     void Start()
     {
         CreateLineMaterial();
-        type_ = Random.Range(1, 5);        
+        type_ = Random.Range(1, 5);
         vertices_ = new List<Vector3>();
         switch (type_)
         {
@@ -105,7 +124,7 @@ public class Asteroid : MonoBehaviour
                     Vector3 p2 = new Vector3(-1.0f, -0.25f, 0.0f);
                     Vector3 p3 = new Vector3(-1.0f, 0.5f, 0.0f);
                     Vector3 p4 = new Vector3(-0.25f, 0.5f, 0.0f);
-                    Vector3 p5 = new Vector3(-0.5f, 1.0f, 0.0f);                    
+                    Vector3 p5 = new Vector3(-0.5f, 1.0f, 0.0f);
                     Vector3 p6 = new Vector3(0.25f, 1.0f, 0.0f);
                     Vector3 p7 = new Vector3(1.0f, 0.5f, 0.0f);
                     Vector3 p8 = new Vector3(0.25f, 0.0f, 0.0f);
@@ -121,7 +140,7 @@ public class Asteroid : MonoBehaviour
                     vertices_.Add(p7);
                     vertices_.Add(p8);
                     vertices_.Add(p9);
-                    vertices_.Add(p10);                    
+                    vertices_.Add(p10);
                 }
                 break;
         }
@@ -139,8 +158,32 @@ public class Asteroid : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {
+        int score = 0;
+        switch (size_)
+        {
+            case 1:
+                score = 20;
+                break;
+            case 2:
+                score = 50;
+                break;
+            case 3:
+                score = 100;
+                break;
+        }
+        GameObject.Find("GameController").GetComponent<GameController>().AddScore(score);
+        if (size_ > 1)
+        {
+            GameObject child_asteroid_1 = (GameObject)Instantiate(asteroid_prefab_, transform.position, Quaternion.identity);
+            child_asteroid_1.GetComponent<Asteroid>().SetAsteroidSize(size_ - 1);
+            child_asteroid_1.rigidbody2D.velocity = Quaternion.Euler(0, 0, -30) * rigidbody2D.velocity;
+            GameObject child_asteroid_2 = (GameObject)Instantiate(asteroid_prefab_, transform.position, Quaternion.identity);
+            child_asteroid_2.GetComponent<Asteroid>().SetAsteroidSize(size_ - 1);
+            child_asteroid_2.rigidbody2D.velocity = Quaternion.Euler(0, 0, 30) * rigidbody2D.velocity;
+
+
+        }
         Destroy(gameObject);
-        GameObject.Find("GameController").GetComponent<GameController>().AddScore(20);        
     }
 
     void CreateLineMaterial()
@@ -161,15 +204,16 @@ public class Asteroid : MonoBehaviour
 
     void OnGUI()
     {
-        RenderShip();
+        Render();
     }
 
-    void RenderShip()
+    void Render()
     {
         line_material_.SetPass(0);
         GL.PushMatrix();
         Matrix4x4 trs_matrix = Matrix4x4.TRS(transform.position, transform.rotation, transform.localScale);
         GL.MultMatrix(trs_matrix);
+        //DrawBoundingBox();
         DrawLines();
         DrawSquares(0.02f);
         GL.PopMatrix();
@@ -204,6 +248,27 @@ public class Asteroid : MonoBehaviour
             GL.Vertex3(vertice.x + half_size, vertice.y + half_size, 0.0f);
             GL.Vertex3(vertice.x - half_size, vertice.y + half_size, 0.0f);
         }
+        GL.End();
+    }
+
+    void DrawBoundingBox()
+    {
+        BoxCollider2D bc = (BoxCollider2D)gameObject.GetComponent<BoxCollider2D>();
+        
+        GL.Color(square_color_);
+        GL.Begin(GL.LINES);
+        GL.Vertex3(bc.center.x - bc.size.x/2.0f, bc.center.y - bc.size.y/2.0f,0.0f);
+        GL.Vertex3(bc.center.x + bc.size.x / 2.0f, bc.center.y - bc.size.y / 2.0f, 0.0f);
+
+        GL.Vertex3(bc.center.x + bc.size.x / 2.0f, bc.center.y - bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.center.x + bc.size.x / 2.0f, bc.center.y + bc.size.y / 2.0f, 0.0f);
+
+        GL.Vertex3(bc.center.x + bc.size.x / 2.0f, bc.center.y + bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.center.x - bc.size.x / 2.0f, bc.center.y + bc.size.y / 2.0f, 0.0f);
+
+        GL.Vertex3(bc.center.x - bc.size.x / 2.0f, bc.center.y + bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.center.x - bc.size.x / 2.0f, bc.center.y - bc.size.y / 2.0f, 0.0f);
+
         GL.End();
     }
 }
