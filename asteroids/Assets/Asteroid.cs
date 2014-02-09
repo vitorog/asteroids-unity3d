@@ -71,11 +71,58 @@ public class Asteroid : MonoBehaviour
                     vertices_.Add(p9);
                     vertices_.Add(p10);
                     vertices_.Add(p11);
+                    vertices_.Add(p12);
                 }
                 break;
             case 3:
+                {
+                    Vector3 p1 = new Vector3(-0.5f, -1.0f, 0.0f);
+                    Vector3 p2 = new Vector3(-1.0f, -0.25f, 0.0f);
+                    Vector3 p3 = new Vector3(-0.5f, 0.0f, 0.0f);
+                    Vector3 p4 = new Vector3(-1.0f, 0.25f, 0.0f);
+                    Vector3 p5 = new Vector3(-0.5f, 1.0f, 0.0f);
+                    Vector3 p6 = new Vector3(0.5f, 1.0f, 0.0f);
+                    Vector3 p7 = new Vector3(1.0f, 0.25f, 0.0f);
+                    Vector3 p8 = new Vector3(0.5f, -1.0f, 0.0f);
+                    Vector3 p9 = new Vector3(0.0f, -1.0f, 0.0f);
+                    Vector3 p10 = new Vector3(0.0f, -0.25f, 0.0f);
+
+                    vertices_.Add(p1);
+                    vertices_.Add(p2);
+                    vertices_.Add(p3);
+                    vertices_.Add(p4);
+                    vertices_.Add(p5);
+                    vertices_.Add(p6);
+                    vertices_.Add(p7);
+                    vertices_.Add(p8);
+                    vertices_.Add(p9);
+                    vertices_.Add(p10);
+                }
                 break;
             case 4:
+                {
+                    Vector3 p1 = new Vector3(-0.5f, -1.0f, 0.0f);
+                    Vector3 p2 = new Vector3(-1.0f, -0.25f, 0.0f);
+                    Vector3 p3 = new Vector3(-1.0f, 0.5f, 0.0f);
+                    Vector3 p4 = new Vector3(-0.25f, 0.5f, 0.0f);
+                    Vector3 p5 = new Vector3(-0.5f, 1.0f, 0.0f);                    
+                    Vector3 p6 = new Vector3(0.25f, 1.0f, 0.0f);
+                    Vector3 p7 = new Vector3(1.0f, 0.5f, 0.0f);
+                    Vector3 p8 = new Vector3(0.25f, 0.0f, 0.0f);
+                    Vector3 p9 = new Vector3(1.0f, -0.5f, 0.0f);
+                    Vector3 p10 = new Vector3(0.25f, -1.0f, 0.0f);
+
+                    vertices_.Add(p1);
+                    vertices_.Add(p2);
+                    vertices_.Add(p3);
+                    vertices_.Add(p4);
+                    vertices_.Add(p5);
+                    vertices_.Add(p6);
+                    vertices_.Add(p7);
+                    vertices_.Add(p8);
+                    vertices_.Add(p9);
+                    vertices_.Add(p10);                    
+                }
                 break;
         }
 
