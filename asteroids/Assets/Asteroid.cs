@@ -162,13 +162,13 @@ public class Asteroid : MonoBehaviour
         switch (size_)
         {
             case 1:
-                score = 20;
+                score = 100;
                 break;
             case 2:
                 score = 50;
                 break;
             case 3:
-                score = 100;
+                score = 20;
                 break;
         }
         GameObject.Find("GameController").GetComponent<GameController>().AddScore(score);
