@@ -17,7 +17,7 @@ public class Projectile : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
+    {        
         time_alive_ += Time.deltaTime;
         if (time_alive_ > max_time_alive_)
         {

@@ -12,16 +12,20 @@ public class PlayerShip : MonoBehaviour
     public float hyperspace_explode_chance_;
     public Rigidbody2D rigid_body_;
     public Projectile projectile_;
+    public ParticleSystem thrust_particles_prefab_;
 
     private bool alive_;
     private bool on_hyperspace_;
     private float hyperspace_timer_;
+    private ParticleSystem thrust_particles_instance_;
 
 
     // Use this for initialization
     void Start()
     {        
-        alive_ = true;        
+        alive_ = true;
+        thrust_particles_instance_ = (ParticleSystem)Instantiate(thrust_particles_prefab_);
+        thrust_particles_instance_.enableEmission = false;
     }
 
     public bool IsPlayerAlive()
@@ -38,7 +42,7 @@ public class PlayerShip : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 Projectile p = (Projectile)GameObject.Instantiate(projectile_, transform.position, transform.rotation);
-                p.rigidbody2D.velocity = transform.up * projectile_speed_ * Time.deltaTime;
+                p.rigidbody2D.velocity = transform.up * projectile_speed_ * Time.deltaTime;                
             }
             if (Input.GetAxis("Vertical") < 0)
             {
@@ -72,6 +76,11 @@ public class PlayerShip : MonoBehaviour
         if (Input.GetAxis("Vertical") > 0)
         {
             rigid_body_.AddForce(transform.up * thrust_force_ * Time.deltaTime);
+            rigid_body_.drag = 0.0f;           
+        }
+        else
+        {
+            rigid_body_.drag = 0.4f;            
         }
         float curr_velocity_mag = rigid_body_.velocity.magnitude;
         if (curr_velocity_mag > max_velocity_)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class Asteroid : MonoBehaviour
 {
+    public ParticleSystem explosion_prefab_;
     public GameObject asteroid_prefab_;
     private Material line_material_;
     private List<Vector3> vertices_;
@@ -11,6 +12,7 @@ public class Asteroid : MonoBehaviour
     private Color square_color_;
     private int type_;
     private int size_ = 3; //3= Big, 2 = Medium, 1 = Small;
+    private ParticleSystem explosion_instance_;
 
 
     public void SetAsteroidSize(int size)
@@ -19,7 +21,7 @@ public class Asteroid : MonoBehaviour
         switch (size_)
         {
             case 1:
-                transform.localScale = new Vector3(0.1f, 0.1f, 1.0f);
+                transform.localScale = new Vector3(0.15f, 0.15f, 1.0f);
                 break;
             case 2:
                 transform.localScale = new Vector3(0.25f, 0.25f, 1.0f);
@@ -32,7 +34,7 @@ public class Asteroid : MonoBehaviour
 
     // Use this for initialization
     void Start()
-    {
+    {        
         CreateLineMaterial();
         type_ = Random.Range(1, 5);
         vertices_ = new List<Vector3>();
@@ -158,17 +160,25 @@ public class Asteroid : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {
+        explosion_instance_ = (ParticleSystem)Instantiate(explosion_prefab_, transform.position, transform.rotation);   
+        explosion_instance_.enableEmission = true;             
         int score = 0;
         switch (size_)
         {
             case 1:
                 score = 100;
+                explosion_instance_.startSize = 0.08f;
+                explosion_instance_.startLifetime = 2;
                 break;
             case 2:
                 score = 50;
+                explosion_instance_.startSize = 0.1f;
+                explosion_instance_.startLifetime = 5;
                 break;
             case 3:
                 score = 20;
+                explosion_instance_.startSize = 0.2f;
+                explosion_instance_.startLifetime = 7;
                 break;
         }
         GameObject.Find("GameController").GetComponent<GameController>().AddScore(score);
@@ -182,7 +192,7 @@ public class Asteroid : MonoBehaviour
             child_asteroid_2.rigidbody2D.velocity = Quaternion.Euler(0, 0, 30) * rigidbody2D.velocity;
 
 
-        }
+        }        
         Destroy(gameObject);
     }
 

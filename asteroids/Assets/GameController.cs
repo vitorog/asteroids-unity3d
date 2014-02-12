@@ -28,7 +28,6 @@ public class GameController : MonoBehaviour
     public float blinking_delay_;
 
     private int max_asteroids_;
-    private float blinking_timer_;
     private GUIText score_text_;
     private GUIText info_text_;
     private GAME_STATE curr_state_;
@@ -41,8 +40,7 @@ public class GameController : MonoBehaviour
 
     // Use this for initialization
     void Start()
-    {
-        blinking_timer_ = 0.0f;
+    {        
         max_asteroids_ = 5;
 
         GameObject score_game_object = new GameObject("ScoreText");
@@ -89,16 +87,21 @@ public class GameController : MonoBehaviour
         switch (curr_state_)
         {
             case GAME_STATE.MAIN_MENU:
+                info_text_.text = "PUSH START";
+                if (!IsInvoking("BlinkInfoText"))
+                {
+                    InvokeRepeating("BlinkInfoText", 0.0f, blinking_delay_);
+                }
                 if (GameObject.FindGameObjectsWithTag("Asteroid").Length < max_asteroids_)
                 {
                     GenerateAsteroid();
                 }
-                info_text_.text = "PUSH START";
-                BlinkInfoText();
+                                
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
                     Init();
                     curr_state_ = GAME_STATE.PLAYING;
+                    CancelInvoke("BlinkInfoText");
                 }
                 break;
             case GAME_STATE.PLAYING:
@@ -251,11 +254,6 @@ public class GameController : MonoBehaviour
 
     void BlinkInfoText()
     {
-        blinking_timer_ += Time.deltaTime;
-        if (blinking_timer_ > blinking_delay_)
-        {
-            info_text_.enabled = !info_text_.enabled;
-            blinking_timer_ = 0.0f;
-        }
+        info_text_.enabled = !info_text_.enabled;
     }
 }
