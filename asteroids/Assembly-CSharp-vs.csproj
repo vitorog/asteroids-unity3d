@@ -49,6 +49,7 @@
      <Compile Include="Assets\Asteroid.cs" />
      <Compile Include="Assets\DestroyParticleSystem.cs" />
      <Compile Include="Assets\GameController.cs" />
+     <Compile Include="Assets\MusicPlayer.cs" />
      <Compile Include="Assets\PlayerShip.cs" />
      <Compile Include="Assets\PlayerShipRenderer.cs" />
      <Compile Include="Assets\Projectile.cs" />

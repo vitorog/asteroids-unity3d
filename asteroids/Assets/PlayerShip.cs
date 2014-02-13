@@ -95,12 +95,19 @@ public class PlayerShip : MonoBehaviour
             //{
             //    gameObject.GetComponent<AudioSource>().Play();
             //}
+            if (!gameObject.GetComponents<AudioSource>()[1].isPlaying)
+            {
+                gameObject.GetComponents<AudioSource>()[1].Play();
+            }
         }
         else
         {
             rigid_body_.drag = 0.4f;
             thrust_particles_instance_.enableEmission = false;
-            //gameObject.GetComponent<AudioSource>().Stop();            
+            if (gameObject.GetComponents<AudioSource>()[1].isPlaying)
+            {
+                gameObject.GetComponents<AudioSource>()[1].Stop();
+            }
         }
         float curr_velocity_mag = rigid_body_.velocity.magnitude;
         if (curr_velocity_mag > max_velocity_)
@@ -139,7 +146,7 @@ public class PlayerShip : MonoBehaviour
             Projectile p = (Projectile)GameObject.Instantiate(projectile_, transform.position, transform.rotation);
             p.rigidbody2D.velocity = transform.up * projectile_speed_ * Time.deltaTime;
 
-            gameObject.GetComponent<AudioSource>().Play();
+            gameObject.GetComponents<AudioSource>()[0].Play();
             
         }
     }

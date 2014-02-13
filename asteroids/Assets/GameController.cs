@@ -19,6 +19,7 @@ public class GameController : MonoBehaviour
     public GameObject player_ship_prefab_;
     public GameObject hud_player_life_prefab_;
     public Asteroid asteroid_prefab_;
+    public GameObject music_player_prefab_;
 
     public float max_asteroid_speed_;
     public float min_asteroid_speed_;
@@ -40,8 +41,9 @@ public class GameController : MonoBehaviour
     private int num_lives_;
     private bool num_lives_changed_;
     private List<GameObject> hud_player_lives_;
-    private GameObject instatiated_player_ship_;
+    private GameObject player_ship_intance_;
     private float respawn_timer_;
+    private GameObject music_player_instance_;
 
     // Use this for initialization
     void Start()
@@ -120,11 +122,11 @@ public class GameController : MonoBehaviour
                 CleanAsteroids();
                 InitLevel();
                 current_state_ = GAME_STATE.PLAYING;
+                music_player_instance_ = (GameObject)Instantiate(music_player_prefab_);
                 break;
-            case GAME_STATE.PLAYING:
-                
+            case GAME_STATE.PLAYING:                
                 info_text_.enabled = false;
-                if (instatiated_player_ship_ != null && !instatiated_player_ship_.GetComponent<PlayerShip>().IsPlayerAlive())
+                if (player_ship_intance_ != null && !player_ship_intance_.GetComponent<PlayerShip>().IsPlayerAlive())
                 {
                     current_state_ = GAME_STATE.PLAYER_DESTROYED;
                 }
@@ -140,6 +142,7 @@ public class GameController : MonoBehaviour
                 {
                     SpawnPlayer();
                     current_state_ = GAME_STATE.PLAYING;
+                    music_player_instance_ = (GameObject)Instantiate(music_player_prefab_);
                 }
                 break;
             case GAME_STATE.HIGH_SCORES:
@@ -175,9 +178,9 @@ public class GameController : MonoBehaviour
 
     void OnPlayerDestruction()
     {
-        if (instatiated_player_ship_ != null)
+        if (player_ship_intance_ != null)
         {
-            Destroy(instatiated_player_ship_);
+            Destroy(player_ship_intance_);
             if (hud_player_lives_.Count > 0)
             {
                 Destroy(hud_player_lives_[num_lives_ - 1]);
@@ -194,6 +197,7 @@ public class GameController : MonoBehaviour
             }
             respawn_timer_ = 0.0f;
         }
+        Destroy(music_player_instance_);
     }
 
     void GenerateAsteroid()
@@ -278,7 +282,7 @@ public class GameController : MonoBehaviour
 
     void SpawnPlayer()
     {
-        instatiated_player_ship_ = (GameObject)Instantiate(player_ship_prefab_, Vector3.zero, Quaternion.identity);
+        player_ship_intance_ = (GameObject)Instantiate(player_ship_prefab_, Vector3.zero, Quaternion.identity);
     }
 
     void BlinkInfoText()
