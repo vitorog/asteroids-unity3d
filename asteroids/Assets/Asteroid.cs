@@ -13,6 +13,7 @@ public class Asteroid : MonoBehaviour
     private int type_;
     private int size_ = 3; //3= Big, 2 = Medium, 1 = Small;
     private ParticleSystem explosion_instance_;
+    private bool is_alive_;
 
 
     public void SetAsteroidSize(int size)
@@ -34,7 +35,8 @@ public class Asteroid : MonoBehaviour
 
     // Use this for initialization
     void Start()
-    {        
+    {
+        is_alive_ = true;
         CreateLineMaterial();
         type_ = Random.Range(1, 5);
         vertices_ = new List<Vector3>();
@@ -155,13 +157,15 @@ public class Asteroid : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 
     void OnCollisionEnter2D(Collision2D c)
     {
         explosion_instance_ = (ParticleSystem)Instantiate(explosion_prefab_, transform.position, transform.rotation);   
-        explosion_instance_.enableEmission = true;             
+        explosion_instance_.enableEmission = true;
+        gameObject.GetComponent<AudioSource>().Play();
+        
         int score = 0;
         switch (size_)
         {
@@ -192,8 +196,12 @@ public class Asteroid : MonoBehaviour
             child_asteroid_2.rigidbody2D.velocity = Quaternion.Euler(0, 0, 30) * rigidbody2D.velocity;
 
 
-        }        
-        Destroy(gameObject);
+        }
+        //This has to be disabled because the object will only be destroyed
+        //after the sound effect is finished
+        gameObject.GetComponent<BoxCollider2D>().enabled = false;            
+        Destroy(gameObject, gameObject.GetComponent<AudioSource>().clip.length);
+        is_alive_ = false;
     }
 
     void CreateLineMaterial()
@@ -214,7 +222,10 @@ public class Asteroid : MonoBehaviour
 
     void OnGUI()
     {
-        Render();
+        if (is_alive_)
+        {
+            Render();
+        }
     }
 
     void Render()

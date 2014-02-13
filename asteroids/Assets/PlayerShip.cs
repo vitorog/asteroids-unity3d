@@ -14,6 +14,7 @@ public class PlayerShip : MonoBehaviour
     public Rigidbody2D rigid_body_;
     public Projectile projectile_;
     public ParticleSystem thrust_particles_prefab_;
+    public AudioClip projectile_sound_;
 
     private bool alive_;
     private bool on_hyperspace_;
@@ -25,8 +26,11 @@ public class PlayerShip : MonoBehaviour
     void Start()
     {        
         alive_ = true;
-        //thrust_particles_instance_ = (ParticleSystem)Instantiate(thrust_particles_prefab_);
-        //thrust_particles_instance_.enableEmission = false;
+        thrust_particles_instance_ = (ParticleSystem)Instantiate(thrust_particles_prefab_);
+        thrust_particles_instance_.enableEmission = false;
+        thrust_particles_instance_.transform.parent = transform;
+        
+        
     }
 
     public bool IsPlayerAlive()
@@ -42,11 +46,7 @@ public class PlayerShip : MonoBehaviour
             transform.Rotate(Vector3.forward * ((-1) * Input.GetAxis("Horizontal") * rotate_speed_ * Time.deltaTime));
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                if (GameObject.FindGameObjectsWithTag("PlayerProjectile").Length < max_projectiles_number_)
-                {
-                    Projectile p = (Projectile)GameObject.Instantiate(projectile_, transform.position, transform.rotation);
-                    p.rigidbody2D.velocity = transform.up * projectile_speed_ * Time.deltaTime;
-                }
+                Shoot();
             }
             if (Input.GetAxis("Vertical") < 0)
             {
@@ -80,11 +80,27 @@ public class PlayerShip : MonoBehaviour
         if (Input.GetAxis("Vertical") > 0)
         {
             rigid_body_.AddForce(transform.up * thrust_force_ * Time.deltaTime);
-            rigid_body_.drag = 0.0f;           
+            rigid_body_.drag = 0.0f;
+            thrust_particles_instance_.transform.position = transform.position;
+            thrust_particles_instance_.transform.localPosition = new Vector3(0.0f, -1.0f, 0.0f);
+            thrust_particles_instance_.enableEmission = true;
+            //ParticleSystem.Particle[] particles = new ParticleSystem.Particle[thrust_particles_instance_.particleCount];
+            //thrust_particles_instance_.GetParticles(particles);
+            //for (int i = 0; i < thrust_particles_instance_.particleCount; i++)
+            //{
+            //    ParticleSystem.Particle p = particles[i];
+            //    p.velocity = -transform.up;                
+            //}
+            //if (!gameObject.GetComponent<AudioSource>().isPlaying)
+            //{
+            //    gameObject.GetComponent<AudioSource>().Play();
+            //}
         }
         else
         {
-            rigid_body_.drag = 0.4f;            
+            rigid_body_.drag = 0.4f;
+            thrust_particles_instance_.enableEmission = false;
+            //gameObject.GetComponent<AudioSource>().Stop();            
         }
         float curr_velocity_mag = rigid_body_.velocity.magnitude;
         if (curr_velocity_mag > max_velocity_)
@@ -114,6 +130,18 @@ public class PlayerShip : MonoBehaviour
         gameObject.GetComponent<PlayerShipRenderer>().enabled = false;
         gameObject.GetComponent<BoxCollider2D>().enabled = false;
         hyperspace_timer_ = 0.0f;
+    }
+
+    void Shoot()
+    {
+        if (GameObject.FindGameObjectsWithTag("PlayerProjectile").Length < max_projectiles_number_)
+        {
+            Projectile p = (Projectile)GameObject.Instantiate(projectile_, transform.position, transform.rotation);
+            p.rigidbody2D.velocity = transform.up * projectile_speed_ * Time.deltaTime;
+
+            gameObject.GetComponent<AudioSource>().Play();
+            
+        }
     }
 
 }
