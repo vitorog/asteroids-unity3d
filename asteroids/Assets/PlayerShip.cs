@@ -10,6 +10,7 @@ public class PlayerShip : MonoBehaviour
     public float projectile_speed_;
     public float hyperspace_duration_;
     public float hyperspace_explode_chance_;
+    public int max_projectiles_number_;
     public Rigidbody2D rigid_body_;
     public Projectile projectile_;
     public ParticleSystem thrust_particles_prefab_;
@@ -24,8 +25,8 @@ public class PlayerShip : MonoBehaviour
     void Start()
     {        
         alive_ = true;
-        thrust_particles_instance_ = (ParticleSystem)Instantiate(thrust_particles_prefab_);
-        thrust_particles_instance_.enableEmission = false;
+        //thrust_particles_instance_ = (ParticleSystem)Instantiate(thrust_particles_prefab_);
+        //thrust_particles_instance_.enableEmission = false;
     }
 
     public bool IsPlayerAlive()
@@ -41,8 +42,11 @@ public class PlayerShip : MonoBehaviour
             transform.Rotate(Vector3.forward * ((-1) * Input.GetAxis("Horizontal") * rotate_speed_ * Time.deltaTime));
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                Projectile p = (Projectile)GameObject.Instantiate(projectile_, transform.position, transform.rotation);
-                p.rigidbody2D.velocity = transform.up * projectile_speed_ * Time.deltaTime;                
+                if (GameObject.FindGameObjectsWithTag("PlayerProjectile").Length < max_projectiles_number_)
+                {
+                    Projectile p = (Projectile)GameObject.Instantiate(projectile_, transform.position, transform.rotation);
+                    p.rigidbody2D.velocity = transform.up * projectile_speed_ * Time.deltaTime;
+                }
             }
             if (Input.GetAxis("Vertical") < 0)
             {
@@ -58,8 +62,8 @@ public class PlayerShip : MonoBehaviour
                 gameObject.GetComponent<PlayerShipRenderer>().enabled = true;
                 gameObject.GetComponent<BoxCollider2D>().enabled = true;
 
-                float chance = Random.Range(0, 101);
-                if (chance < hyperspace_explode_chance_)
+                float chance = Random.Range(0.0f, 1.0f);
+                if ((chance*100) < hyperspace_explode_chance_)
                 {
                     alive_ = false;
                 }

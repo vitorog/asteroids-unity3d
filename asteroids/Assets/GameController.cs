@@ -5,7 +5,9 @@ using System.Collections.Generic;
 enum GAME_STATE
 {
     MAIN_MENU,
+    LEVEL_STARTING,
     PLAYING,
+    LEVEL_FINISHED,
     PLAYER_DESTROYED,
     GAME_OVER,
     HIGH_SCORES
@@ -27,10 +29,13 @@ public class GameController : MonoBehaviour
     public float hud_life_distance_;
     public float blinking_delay_;
 
+    private int current_level_;
+    private int max_score_;
     private int max_asteroids_;
-    private GUIText score_text_;
+    private GUIText current_score_text_;
     private GUIText info_text_;
-    private GAME_STATE curr_state_;
+    private GUIText max_score_text_;
+    private GAME_STATE current_state_;
     private int current_score_;
     private int num_lives_;
     private bool num_lives_changed_;
@@ -40,13 +45,15 @@ public class GameController : MonoBehaviour
 
     // Use this for initialization
     void Start()
-    {        
+    {
+        current_level_ = 1;
+        max_score_ = 0;
         max_asteroids_ = 5;
 
         GameObject score_game_object = new GameObject("ScoreText");
-        score_text_ = score_game_object.AddComponent<GUIText>();
-        score_text_.gameObject.transform.position = new Vector3(0.1f, 0.95f, 0.0f);
-        score_text_.text = "0";
+        current_score_text_ = score_game_object.AddComponent<GUIText>();
+        current_score_text_.gameObject.transform.position = new Vector3(0.1f, 0.95f, 0.0f);
+        current_score_text_.text = "0";
 
         GameObject info_text_object = new GameObject("InfoText");
         info_text_ = info_text_object.AddComponent<GUIText>();
@@ -54,16 +61,21 @@ public class GameController : MonoBehaviour
         info_text_.guiText.alignment = TextAlignment.Center;
         info_text_.guiText.anchor = TextAnchor.MiddleCenter;
 
-        curr_state_ = GAME_STATE.MAIN_MENU;
-        hud_player_lives_ = new List<GameObject>();
+        GameObject max_score_object = new GameObject("MaxScore");
+        max_score_text_ = max_score_object.AddComponent<GUIText>();
+        max_score_text_.gameObject.transform.position = new Vector3(0.5f, 0.95f, 0.0f);
+        max_score_text_.guiText.alignment = TextAlignment.Center;
+        max_score_text_.guiText.anchor = TextAnchor.MiddleCenter;
+        max_score_text_.text = "0";
 
-        //Init();
+        current_state_ = GAME_STATE.MAIN_MENU;
+        hud_player_lives_ = new List<GameObject>();       
     }
 
     public void AddScore(int score)
     {
         current_score_ += score;
-        score_text_.text = current_score_.ToString();
+        current_score_text_.text = current_score_.ToString();
         if (current_score_ % score_to_life_rate_ == 0)
         {
             num_lives_++;
@@ -84,9 +96,9 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        switch (curr_state_)
+        switch (current_state_)
         {
-            case GAME_STATE.MAIN_MENU:
+            case GAME_STATE.MAIN_MENU:                
                 info_text_.text = "PUSH START";
                 if (!IsInvoking("BlinkInfoText"))
                 {
@@ -100,16 +112,26 @@ public class GameController : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
                     Init();
-                    curr_state_ = GAME_STATE.PLAYING;
+                    current_state_ = GAME_STATE.LEVEL_STARTING;
                     CancelInvoke("BlinkInfoText");
                 }
                 break;
+            case GAME_STATE.LEVEL_STARTING:
+                CleanAsteroids();
+                InitLevel();
+                current_state_ = GAME_STATE.PLAYING;
+                break;
             case GAME_STATE.PLAYING:
+                
                 info_text_.enabled = false;
                 if (instatiated_player_ship_ != null && !instatiated_player_ship_.GetComponent<PlayerShip>().IsPlayerAlive())
                 {
-                    curr_state_ = GAME_STATE.PLAYER_DESTROYED;
+                    current_state_ = GAME_STATE.PLAYER_DESTROYED;
                 }
+                break;
+            case GAME_STATE.LEVEL_FINISHED:
+                current_level_++;
+                current_state_ = GAME_STATE.LEVEL_STARTING;
                 break;
             case GAME_STATE.PLAYER_DESTROYED:
                 OnPlayerDestruction();
@@ -117,18 +139,25 @@ public class GameController : MonoBehaviour
                 if (respawn_timer_ > seconds_to_respawn_)
                 {
                     SpawnPlayer();
-                    curr_state_ = GAME_STATE.PLAYING;
+                    current_state_ = GAME_STATE.PLAYING;
                 }
                 break;
             case GAME_STATE.HIGH_SCORES:
                 break;
             case GAME_STATE.GAME_OVER:
+                if (current_score_ > max_score_)
+                {
+                    max_score_ = current_score_;
+                    current_score_ = 0;
+                    max_score_text_.text = max_score_.ToString();
+                }
                 info_text_.enabled = true;
                 info_text_.text = "GAME OVER";
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    Init();
-                    curr_state_ = GAME_STATE.PLAYING;
+                    CleanAsteroids();
+                    current_score_text_.text = "0";
+                    current_state_ = GAME_STATE.MAIN_MENU;
                 }
                 break;
         }
@@ -156,11 +185,11 @@ public class GameController : MonoBehaviour
                 num_lives_ -= 1;
                 if (num_lives_ > 0)
                 {
-                    curr_state_ = GAME_STATE.PLAYER_DESTROYED;
+                    current_state_ = GAME_STATE.PLAYER_DESTROYED;
                 }
                 else
                 {
-                    curr_state_ = GAME_STATE.GAME_OVER;
+                    current_state_ = GAME_STATE.GAME_OVER;
                 }
             }
             respawn_timer_ = 0.0f;
@@ -256,4 +285,30 @@ public class GameController : MonoBehaviour
     {
         info_text_.enabled = !info_text_.enabled;
     }
+
+    void CleanAsteroids()
+    {
+        GameObject[] asteroids = GameObject.FindGameObjectsWithTag("Asteroid");
+        for (int i = 0; i < asteroids.Length; i++)
+        {
+            Destroy(asteroids[i]);
+        }
+    }
+
+    void InitLevel()
+    {
+        switch (current_level_)
+        {
+            case 1:
+                break;
+            case 2:
+                max_asteroids_++;
+                break;
+        }
+        for(int i = 0; i < max_asteroids_; i++)
+        {
+            GenerateAsteroid();
+        }
+
+    }    
 }
