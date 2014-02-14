@@ -45,6 +45,20 @@ public class GameController : MonoBehaviour
     private float respawn_timer_;
     private GameObject music_player_instance_;
 
+    //PUBLIC FUNCTIONS
+    public void AddScore(int score)
+    {
+        current_score_ += score;
+        current_score_text_.text = current_score_.ToString();
+        if (current_score_ > score_to_life_rate_)
+        {
+            num_lives_++;
+            AddLifeHUD();
+            score_to_life_rate_ += score_to_life_rate_;
+        }
+    }
+
+    //PRIVATE FUNCTIONS
     // Use this for initialization
     void Start()
     {
@@ -71,97 +85,36 @@ public class GameController : MonoBehaviour
         max_score_text_.text = "0";
 
         current_state_ = GAME_STATE.MAIN_MENU;
-        hud_player_lives_ = new List<GameObject>();       
-    }
+        hud_player_lives_ = new List<GameObject>();
 
-    public void AddScore(int score)
-    {
-        current_score_ += score;
-        current_score_text_.text = current_score_.ToString();
-        if (current_score_ % score_to_life_rate_ == 0)
-        {
-            num_lives_++;
-            AddLifeHUD();
-        }
-    }
-
-    void Init()
-    {
-        num_lives_ = 3;
-        for (int i = 0; i < num_lives_; i++)
-        {
-            AddLifeHUD();
-        }
-        SpawnPlayer();
-    }
+        music_player_instance_ = (GameObject)Instantiate(music_player_prefab_);
+    }  
 
     // Update is called once per frame
     void Update()
     {
         switch (current_state_)
         {
-            case GAME_STATE.MAIN_MENU:                
-                info_text_.text = "PUSH START";
-                if (!IsInvoking("BlinkInfoText"))
-                {
-                    InvokeRepeating("BlinkInfoText", 0.0f, blinking_delay_);
-                }
-                if (GameObject.FindGameObjectsWithTag("Asteroid").Length < max_asteroids_)
-                {
-                    GenerateAsteroid();
-                }
-                                
-                if (Input.GetKeyDown(KeyCode.Space))
-                {
-                    Init();
-                    current_state_ = GAME_STATE.LEVEL_STARTING;
-                    CancelInvoke("BlinkInfoText");
-                }
+            case GAME_STATE.MAIN_MENU:
+                OnMainMenu();
                 break;
             case GAME_STATE.LEVEL_STARTING:
-                CleanAsteroids();
-                InitLevel();
-                current_state_ = GAME_STATE.PLAYING;
-                music_player_instance_ = (GameObject)Instantiate(music_player_prefab_);
+                OnLevelStarting();                           
                 break;
-            case GAME_STATE.PLAYING:                
-                info_text_.enabled = false;
-                if (player_ship_intance_ != null && !player_ship_intance_.GetComponent<PlayerShip>().IsPlayerAlive())
-                {
-                    current_state_ = GAME_STATE.PLAYER_DESTROYED;
-                }
+            case GAME_STATE.PLAYING:
+                OnPlaying();                   
                 break;
             case GAME_STATE.LEVEL_FINISHED:
-                current_level_++;
-                current_state_ = GAME_STATE.LEVEL_STARTING;
+                OnLevelFinished();
                 break;
             case GAME_STATE.PLAYER_DESTROYED:
-                OnPlayerDestruction();
-                respawn_timer_ += Time.deltaTime;
-                if (respawn_timer_ > seconds_to_respawn_)
-                {
-                    SpawnPlayer();
-                    current_state_ = GAME_STATE.PLAYING;
-                    music_player_instance_ = (GameObject)Instantiate(music_player_prefab_);
-                }
+                OnPlayerDestroyed();
                 break;
             case GAME_STATE.HIGH_SCORES:
+                OnHighScores();
                 break;
             case GAME_STATE.GAME_OVER:
-                if (current_score_ > max_score_)
-                {
-                    max_score_ = current_score_;
-                    current_score_ = 0;
-                    max_score_text_.text = max_score_.ToString();
-                }
-                info_text_.enabled = true;
-                info_text_.text = "GAME OVER";
-                if (Input.GetKeyDown(KeyCode.Space))
-                {
-                    CleanAsteroids();
-                    current_score_text_.text = "0";
-                    current_state_ = GAME_STATE.MAIN_MENU;
-                }
+                OnGameOver();               
                 break;
         }
     }
@@ -175,31 +128,7 @@ public class GameController : MonoBehaviour
         hud_life.transform.position = position;
         hud_player_lives_.Add(hud_life);
     }
-
-    void OnPlayerDestruction()
-    {
-        if (player_ship_intance_ != null)
-        {
-            Destroy(player_ship_intance_);
-            if (hud_player_lives_.Count > 0)
-            {
-                Destroy(hud_player_lives_[num_lives_ - 1]);
-                hud_player_lives_.RemoveAt(num_lives_ - 1);
-                num_lives_ -= 1;
-                if (num_lives_ > 0)
-                {
-                    current_state_ = GAME_STATE.PLAYER_DESTROYED;
-                }
-                else
-                {
-                    current_state_ = GAME_STATE.GAME_OVER;
-                }
-            }
-            respawn_timer_ = 0.0f;
-        }
-        Destroy(music_player_instance_);
-    }
-
+   
     void GenerateAsteroid()
     {
         int corner = Random.Range(1, 5); //1 = Left, 2 = Top, 3 = Right, 4 = Bottom        
@@ -300,12 +229,12 @@ public class GameController : MonoBehaviour
     }
 
     void InitLevel()
-    {
+    {       
         switch (current_level_)
-        {
+        {                
             case 1:
                 break;
-            case 2:
+            default:
                 max_asteroids_++;
                 break;
         }
@@ -313,6 +242,116 @@ public class GameController : MonoBehaviour
         {
             GenerateAsteroid();
         }
+    }
+    
+    //STATE FUNCTIONS
+    void OnMainMenu()
+    {
+        info_text_.text = "PUSH START";
+        if (!IsInvoking("BlinkInfoText"))
+        {
+            InvokeRepeating("BlinkInfoText", 0.0f, blinking_delay_);
+        }
+        if (GameObject.FindGameObjectsWithTag("Asteroid").Length < max_asteroids_)
+        {
+            GenerateAsteroid();
+        }
 
-    }    
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            num_lives_ = 3;
+            for (int i = 0; i < num_lives_; i++)
+            {
+                AddLifeHUD();
+            }
+            SpawnPlayer();
+            CancelInvoke("BlinkInfoText");
+            current_state_ = GAME_STATE.LEVEL_STARTING;            
+        }
+    }
+
+    void OnLevelStarting()
+    {
+        CleanAsteroids();
+        InitLevel();
+        music_player_instance_.GetComponent<MusicPlayer>().Reset();
+        music_player_instance_.GetComponent<MusicPlayer>().Play();
+
+        current_state_ = GAME_STATE.PLAYING;    
+    }
+
+    void OnPlaying()
+    {
+        info_text_.enabled = false;
+        if (player_ship_intance_ != null && !player_ship_intance_.GetComponent<PlayerShip>().IsPlayerAlive())
+        {
+            current_state_ = GAME_STATE.PLAYER_DESTROYED;
+        }
+        if (GameObject.FindGameObjectsWithTag("Asteroid").Length == 0)
+        {
+            music_player_instance_.GetComponent<MusicPlayer>().Stop();
+            current_state_ = GAME_STATE.LEVEL_FINISHED;
+        }           
+    }
+
+    void OnLevelFinished()
+    {
+        current_level_++;
+        current_state_ = GAME_STATE.LEVEL_STARTING;
+    }
+
+    void OnPlayerDestroyed()
+    {
+        if (player_ship_intance_ != null)
+        {
+            Destroy(player_ship_intance_);
+            if (hud_player_lives_.Count > 0)
+            {
+                Destroy(hud_player_lives_[num_lives_ - 1]);
+                hud_player_lives_.RemoveAt(num_lives_ - 1);
+                num_lives_ -= 1;
+                if (num_lives_ > 0)
+                {
+                    current_state_ = GAME_STATE.PLAYER_DESTROYED;
+                }
+                else
+                {
+                    current_state_ = GAME_STATE.GAME_OVER;
+                }
+            }
+            respawn_timer_ = 0.0f;
+        }
+
+        music_player_instance_.GetComponent<MusicPlayer>().Stop();
+        respawn_timer_ += Time.deltaTime;
+        if (respawn_timer_ > seconds_to_respawn_)
+        {
+            SpawnPlayer();
+            music_player_instance_.GetComponent<MusicPlayer>().Reset();
+            music_player_instance_.GetComponent<MusicPlayer>().Play();
+            current_state_ = GAME_STATE.PLAYING;
+        }
+    }
+
+    void OnGameOver()
+    {
+        if (current_score_ > max_score_)
+        {
+            max_score_ = current_score_;
+            current_score_ = 0;
+            max_score_text_.text = max_score_.ToString();
+        }
+        info_text_.enabled = true;
+        info_text_.text = "GAME OVER";
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            CleanAsteroids();
+            current_score_text_.text = "0";
+            current_state_ = GAME_STATE.MAIN_MENU;
+        }
+    }
+
+    void OnHighScores()
+    {
+    }
 }

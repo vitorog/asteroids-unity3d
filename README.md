@@ -2,3 +2,9 @@ asteroids-unity3d
 =================
 
 An asteroids clone made in Unity 3D as a learning experience.
+
+-Graphic assets created with lines and squares, using Unity 3D's GL class
+-Sound effects and music notes created with 
+--bxfr: http://www.bfxr.net/
+--LMMS: http://lmms.sourceforge.net/
+--Audacity: http://audacity.sourceforge.net/

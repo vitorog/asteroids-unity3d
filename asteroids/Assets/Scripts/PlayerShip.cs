@@ -15,6 +15,8 @@ public class PlayerShip : MonoBehaviour
     public Projectile projectile_;
     public ParticleSystem thrust_particles_prefab_;
     public AudioClip projectile_sound_;
+    public GameObject hyperspace_anim_prefab_;
+    public ParticleSystem ship_explosion_prefab_;
 
     private bool alive_;
     private bool on_hyperspace_;
@@ -61,7 +63,7 @@ public class PlayerShip : MonoBehaviour
                 on_hyperspace_ = false;
                 gameObject.GetComponent<PlayerShipRenderer>().enabled = true;
                 gameObject.GetComponent<BoxCollider2D>().enabled = true;
-
+               
                 float chance = Random.Range(0.0f, 1.0f);
                 if ((chance*100) < hyperspace_explode_chance_)
                 {
@@ -122,11 +124,14 @@ public class PlayerShip : MonoBehaviour
         if (c.gameObject.tag == "Asteroid")
         {         
             alive_ = false;
+            Instantiate(ship_explosion_prefab_, transform.position, transform.rotation);
         }
     }
 
     void Hyperspace()
-    {        
+    {
+        GameObject hyperspace_anim = (GameObject)Instantiate(hyperspace_anim_prefab_, transform.position, transform.rotation);
+        hyperspace_anim.GetComponent<HyperspaceAnim>().Init(0);
         gameObject.rigidbody2D.velocity = Vector3.zero;
         float x = Random.Range(0.0f, 1.0f);
         float y = Random.Range(0.0f, 1.0f);
@@ -137,6 +142,10 @@ public class PlayerShip : MonoBehaviour
         gameObject.GetComponent<PlayerShipRenderer>().enabled = false;
         gameObject.GetComponent<BoxCollider2D>().enabled = false;
         hyperspace_timer_ = 0.0f;
+
+        hyperspace_anim = (GameObject)Instantiate(hyperspace_anim_prefab_, transform.position, transform.rotation);
+        hyperspace_anim.GetComponent<HyperspaceAnim>().Init(1);
+
     }
 
     void Shoot()
