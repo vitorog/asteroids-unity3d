@@ -42,32 +42,35 @@ public class PlayerShip : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {        
-        if (!on_hyperspace_)
+    {
+        if (alive_)
         {
-            transform.Rotate(Vector3.forward * ((-1) * Input.GetAxis("Horizontal") * rotate_speed_ * Time.deltaTime));
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (!on_hyperspace_)
             {
-                Shoot();
-            }
-            if (Input.GetAxis("Vertical") < 0)
-            {
-                Hyperspace();
-            }
-        }
-        else
-        {
-            hyperspace_timer_ += Time.deltaTime;
-            if (hyperspace_timer_ > hyperspace_duration_)
-            {
-                on_hyperspace_ = false;
-                gameObject.GetComponent<PlayerShipRenderer>().enabled = true;
-                gameObject.GetComponent<BoxCollider2D>().enabled = true;
-               
-                float chance = Random.Range(0.0f, 1.0f);
-                if ((chance*100) < hyperspace_explode_chance_)
+                transform.Rotate(Vector3.forward * ((-1) * Input.GetAxis("Horizontal") * rotate_speed_ * Time.deltaTime));
+                if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    alive_ = false;
+                    Shoot();
+                }
+                if (Input.GetAxis("Vertical") < 0)
+                {
+                    Hyperspace();
+                }
+            }
+            else
+            {
+                hyperspace_timer_ += Time.deltaTime;
+                if (hyperspace_timer_ > hyperspace_duration_)
+                {
+                    on_hyperspace_ = false;
+                    gameObject.GetComponent<PlayerShipRenderer>().enabled = true;
+                    gameObject.GetComponent<BoxCollider2D>().enabled = true;                    
+
+                    float chance = Random.Range(0.0f, 1.0f);
+                    if ((chance * 100) <= hyperspace_explode_chance_)
+                    {
+                        DestroyShip();
+                    }
                 }
             }
         }
@@ -75,62 +78,70 @@ public class PlayerShip : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (on_hyperspace_)
+        if (alive_)
         {
-            return;
-        }
-        if (Input.GetAxis("Vertical") > 0)
-        {
-            rigid_body_.AddForce(transform.up * thrust_force_ * Time.deltaTime);
-            rigid_body_.drag = 0.0f;
-            thrust_particles_instance_.transform.position = transform.position;
-            thrust_particles_instance_.transform.localPosition = new Vector3(0.0f, -1.0f, 0.0f);
-            thrust_particles_instance_.enableEmission = true;
-            //ParticleSystem.Particle[] particles = new ParticleSystem.Particle[thrust_particles_instance_.particleCount];
-            //thrust_particles_instance_.GetParticles(particles);
-            //for (int i = 0; i < thrust_particles_instance_.particleCount; i++)
-            //{
-            //    ParticleSystem.Particle p = particles[i];
-            //    p.velocity = -transform.up;                
-            //}
-            //if (!gameObject.GetComponent<AudioSource>().isPlaying)
-            //{
-            //    gameObject.GetComponent<AudioSource>().Play();
-            //}
-            if (!gameObject.GetComponents<AudioSource>()[1].isPlaying)
+            if (on_hyperspace_)
             {
-                gameObject.GetComponents<AudioSource>()[1].Play();
+                return;
             }
-        }
-        else
-        {
-            rigid_body_.drag = 0.4f;
-            thrust_particles_instance_.enableEmission = false;
-            if (gameObject.GetComponents<AudioSource>()[1].isPlaying)
+            if (Input.GetAxis("Vertical") > 0)
             {
-                gameObject.GetComponents<AudioSource>()[1].Stop();
+                rigid_body_.AddForce(transform.up * thrust_force_ * Time.deltaTime);
+                rigid_body_.drag = 0.0f;
+                thrust_particles_instance_.transform.position = transform.position;
+                thrust_particles_instance_.transform.localPosition = new Vector3(0.0f, -1.0f, 0.0f);
+                thrust_particles_instance_.enableEmission = true;
+                //ParticleSystem.Particle[] particles = new ParticleSystem.Particle[thrust_particles_instance_.particleCount];
+                //thrust_particles_instance_.GetParticles(particles);
+                //for (int i = 0; i < thrust_particles_instance_.particleCount; i++)
+                //{
+                //    ParticleSystem.Particle p = particles[i];
+                //    p.velocity = -transform.up;                
+                //}
+                //if (!gameObject.GetComponent<AudioSource>().isPlaying)
+                //{
+                //    gameObject.GetComponent<AudioSource>().Play();
+                //}
+                if (!gameObject.GetComponents<AudioSource>()[1].isPlaying)
+                {
+                    gameObject.GetComponents<AudioSource>()[1].Play();
+                }
             }
-        }
-        float curr_velocity_mag = rigid_body_.velocity.magnitude;
-        if (curr_velocity_mag > max_velocity_)
-        {
-            Vector2 curr_velocity = rigid_body_.velocity;
-            rigid_body_.velocity = curr_velocity.normalized * max_velocity_;
+            else
+            {
+                rigid_body_.drag = 0.4f;
+                thrust_particles_instance_.enableEmission = false;
+                if (gameObject.GetComponents<AudioSource>()[1].isPlaying)
+                {
+                    gameObject.GetComponents<AudioSource>()[1].Stop();
+                }
+            }
+            float curr_velocity_mag = rigid_body_.velocity.magnitude;
+            if (curr_velocity_mag > max_velocity_)
+            {
+                Vector2 curr_velocity = rigid_body_.velocity;
+                rigid_body_.velocity = curr_velocity.normalized * max_velocity_;
+            }
         }
     }
 
     void OnCollisionEnter2D(Collision2D c)
     {        
         if (c.gameObject.tag == "Asteroid" || c.gameObject.tag == "EnemyProjectile" || c.gameObject.tag == "EnemyShip")
-        {         
-            alive_ = false;
-            ParticleSystem ship_explosion_instance = (ParticleSystem)Instantiate(ship_explosion_prefab_, transform.position, transform.rotation);
-            ship_explosion_instance.gameObject.GetComponent<AudioSource>().Play();                 
+        {
+            DestroyShip();
         }
     }
 
-    void Hyperspace()
+    void DestroyShip()
     {
+        alive_ = false;
+        ParticleSystem ship_explosion_instance = (ParticleSystem)Instantiate(ship_explosion_prefab_, transform.position, transform.rotation);
+        ship_explosion_instance.gameObject.GetComponent<AudioSource>().Play();             
+    }
+
+    void Hyperspace()
+    {        
         GameObject hyperspace_anim = (GameObject)Instantiate(hyperspace_anim_prefab_, transform.position, transform.rotation);
         hyperspace_anim.GetComponent<HyperspaceAnim>().Init(0);
         gameObject.rigidbody2D.velocity = Vector3.zero;

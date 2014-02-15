@@ -63,7 +63,7 @@ public class GameController : MonoBehaviour
     {
         current_score_ += score;
         current_score_text_.text = current_score_.ToString();
-        if (current_score_ > score_to_life_rate_)
+        if (current_score_ >= score_to_life_rate_)
         {
             num_lives_++;
             AddLifeHUD();
@@ -374,7 +374,9 @@ public class GameController : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
-        {            
+        {
+            current_score_ = 0;
+            current_score_text_.text = "0";
             num_lives_ = 3;
             for (int i = 0; i < num_lives_; i++)
             {
