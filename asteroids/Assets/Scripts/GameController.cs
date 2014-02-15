@@ -21,6 +21,7 @@ public class GameController : MonoBehaviour
     public Asteroid asteroid_prefab_;
     public EnemyShip ufo_prefab_;
     public GameObject music_player_prefab_;
+    public GameObject high_scores_controller_prefab_;
   
     public float score_to_life_rate_;
     public float seconds_to_respawn_;
@@ -52,6 +53,10 @@ public class GameController : MonoBehaviour
     private GameObject player_ship_intance_;
     private float respawn_timer_;
     private GameObject music_player_instance_;
+    private GameObject high_scores_controller_instance_;
+    private List<int> high_scores_;
+    private List<string> high_scores_initials_;
+    private int max_num_high_scores_;    
 
     //PUBLIC FUNCTIONS
     public void AddScore(int score)
@@ -64,6 +69,11 @@ public class GameController : MonoBehaviour
             AddLifeHUD();
             score_to_life_rate_ += score_to_life_rate_;
         }
+    }
+
+    public int GetScore()
+    {
+        return current_score_;
     }
 
     //PRIVATE FUNCTIONS
@@ -95,7 +105,10 @@ public class GameController : MonoBehaviour
         current_state_ = GAME_STATE.MAIN_MENU;
         hud_player_lives_ = new List<GameObject>();
 
-        music_player_instance_ = (GameObject)Instantiate(music_player_prefab_);
+        music_player_instance_ = (GameObject)Instantiate(music_player_prefab_);        
+
+        high_scores_initials_ = new List<string>();
+        high_scores_ = new List<int>();
     }
 
     // Update is called once per frame
@@ -325,7 +338,7 @@ public class GameController : MonoBehaviour
                 break;
                                 
         }
-        InvokeRepeating("GenerateUFO", 0.0f, ufo_delay_);
+        InvokeRepeating("GenerateUFO", ufo_delay_, ufo_delay_);
         for (int i = 0; i < max_asteroids_; i++)
         {
             GenerateAsteroid();
@@ -340,9 +353,23 @@ public class GameController : MonoBehaviour
         {
             InvokeRepeating("BlinkInfoText", 0.0f, blinking_delay_);
         }
-        if (GameObject.FindGameObjectsWithTag("Asteroid").Length < max_asteroids_)
+        if (GameObject.FindGameObjectsWithTag("Asteroid").Length == 0)
         {
-            GenerateAsteroid();
+            ufo_chance_ = 40.0f;
+            ufo_delay_ = 10.0f;
+            max_asteroids_ = 5;
+            max_asteroid_speed_ = 5;
+            min_asteroid_speed_ = 1;
+            max_ufo_speed_ = 5;
+            min_ufo_speed_ = 1;
+            ufo_projectile_speed_ = 400;
+            ufo_shooting_delay_ = 2;
+
+            for (int i = 0; i < max_asteroids_; i++)
+            {
+                GenerateAsteroid();
+            }
+            InvokeRepeating("GenerateUFO", ufo_delay_,ufo_delay_);
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -422,24 +449,38 @@ public class GameController : MonoBehaviour
     }
 
     void OnGameOver()
-    {
-        if (current_score_ > max_score_)
-        {
-            max_score_ = current_score_;
-            current_score_ = 0;
-            max_score_text_.text = max_score_.ToString();
-        }
+    {        
         info_text_.enabled = true;
         info_text_.text = "GAME OVER";
         if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Clear();
-            current_score_text_.text = "0";
-            current_state_ = GAME_STATE.MAIN_MENU;
+        {         
+            current_state_ = GAME_STATE.HIGH_SCORES;
         }
     }
 
     void OnHighScores()
     {
+        Clear();
+        if (high_scores_controller_instance_ == null)
+        {
+            high_scores_controller_instance_ = (GameObject)Instantiate(high_scores_controller_prefab_);
+            high_scores_controller_instance_.GetComponent<HighScoresController>().Init(high_scores_, high_scores_initials_);
+        }        
+        if (high_scores_controller_instance_.GetComponent<HighScoresController>().IsDone())
+        {
+            high_scores_controller_instance_.GetComponent<HighScoresController>().GetUpdatedHighScores(out high_scores_, out high_scores_initials_);
+            Destroy(high_scores_controller_instance_);
+            high_scores_controller_instance_ = null;
+            
+            current_score_text_.text = "0";
+            if (current_score_ > max_score_)
+            {
+                max_score_ = current_score_;
+                current_score_ = 0;
+                max_score_text_.text = max_score_.ToString();
+            }
+
+            current_state_ = GAME_STATE.MAIN_MENU;
+        }        
     }
 }
