@@ -13,4 +13,5 @@ An asteroids clone made in Unity 3D as a learning experience.
 
 --Audacity: http://audacity.sourceforge.net/
 
-![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/image1.png)
+![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/image1.png "Main Menu")
+![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/image2.png "In Game")
