@@ -38,7 +38,7 @@ public class GameController : MonoBehaviour
     private float min_ufo_speed_;
     private float max_asteroid_speed_;
     private float min_asteroid_speed_;
-    private int num_generated_ufos_ = 0;
+    private int num_generated_ufos_;
     private int current_level_;
     private int max_score_;
     private int max_asteroids_;
@@ -281,6 +281,7 @@ public class GameController : MonoBehaviour
         {
             Destroy(ufos[i]);
         }
+        num_generated_ufos_ = 0;
     }
 
     void InitLevel()
@@ -373,7 +374,7 @@ public class GameController : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
-        {
+        {            
             num_lives_ = 3;
             for (int i = 0; i < num_lives_; i++)
             {
