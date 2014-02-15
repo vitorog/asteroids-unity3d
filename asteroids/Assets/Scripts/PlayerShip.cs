@@ -121,10 +121,11 @@ public class PlayerShip : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {        
-        if (c.gameObject.tag == "Asteroid")
+        if (c.gameObject.tag == "Asteroid" || c.gameObject.tag == "EnemyProjectile" || c.gameObject.tag == "EnemyShip")
         {         
             alive_ = false;
-            Instantiate(ship_explosion_prefab_, transform.position, transform.rotation);
+            ParticleSystem ship_explosion_instance = (ParticleSystem)Instantiate(ship_explosion_prefab_, transform.position, transform.rotation);
+            ship_explosion_instance.gameObject.GetComponent<AudioSource>().Play();                 
         }
     }
 

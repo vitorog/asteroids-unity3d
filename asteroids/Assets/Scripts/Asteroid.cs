@@ -185,7 +185,10 @@ public class Asteroid : MonoBehaviour
                 explosion_instance_.startLifetime = 7;
                 break;
         }
-        GameObject.Find("GameController").GetComponent<GameController>().AddScore(score);
+        if (c.gameObject.tag == "PlayerProjectile" || c.gameObject.tag == "Player")
+        {
+            GameObject.Find("GameController").GetComponent<GameController>().AddScore(score);
+        }
         if (size_ > 1)
         {
             GameObject child_asteroid_1 = (GameObject)Instantiate(asteroid_prefab_, transform.position, Quaternion.identity);

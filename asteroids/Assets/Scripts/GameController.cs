@@ -19,17 +19,25 @@ public class GameController : MonoBehaviour
     public GameObject player_ship_prefab_;
     public GameObject hud_player_life_prefab_;
     public Asteroid asteroid_prefab_;
+    public EnemyShip ufo_prefab_;
     public GameObject music_player_prefab_;
-
-    public float max_asteroid_speed_;
-    public float min_asteroid_speed_;
-    public float max_asteroid_torque_;
-    public float min_asteroid_torque_;
+  
     public float score_to_life_rate_;
     public float seconds_to_respawn_;
     public float hud_life_distance_;
     public float blinking_delay_;
+    public float max_asteroid_torque_;
+    public float min_asteroid_torque_;
 
+    private float ufo_projectile_speed_;
+    private float ufo_shooting_delay_;
+    private float ufo_delay_;
+    private float ufo_chance_;
+    private float max_ufo_speed_;
+    private float min_ufo_speed_;
+    private float max_asteroid_speed_;
+    private float min_asteroid_speed_;
+    private int num_generated_ufos_ = 0;
     private int current_level_;
     private int max_score_;
     private int max_asteroids_;
@@ -88,7 +96,7 @@ public class GameController : MonoBehaviour
         hud_player_lives_ = new List<GameObject>();
 
         music_player_instance_ = (GameObject)Instantiate(music_player_prefab_);
-    }  
+    }
 
     // Update is called once per frame
     void Update()
@@ -99,10 +107,10 @@ public class GameController : MonoBehaviour
                 OnMainMenu();
                 break;
             case GAME_STATE.LEVEL_STARTING:
-                OnLevelStarting();                           
+                OnLevelStarting();
                 break;
             case GAME_STATE.PLAYING:
-                OnPlaying();                   
+                OnPlaying();
                 break;
             case GAME_STATE.LEVEL_FINISHED:
                 OnLevelFinished();
@@ -114,7 +122,7 @@ public class GameController : MonoBehaviour
                 OnHighScores();
                 break;
             case GAME_STATE.GAME_OVER:
-                OnGameOver();               
+                OnGameOver();
                 break;
         }
     }
@@ -128,8 +136,8 @@ public class GameController : MonoBehaviour
         hud_life.transform.position = position;
         hud_player_lives_.Add(hud_life);
     }
-   
-    void GenerateAsteroid()
+
+    void GenerateCornerPositionAndDirection(out Vector3 position, out Vector3 direction)
     {
         int corner = Random.Range(1, 5); //1 = Left, 2 = Top, 3 = Right, 4 = Bottom        
         float x = 0.0f;
@@ -184,12 +192,19 @@ public class GameController : MonoBehaviour
                 break;
 
         }
-        Vector3 position = Camera.main.ViewportToWorldPoint(new Vector3(x, y, 0.0f));
+        position = Camera.main.ViewportToWorldPoint(new Vector3(x, y, 0.0f));
         position.z = 0.0f;
 
-        Vector3 direction = Camera.main.ViewportToWorldPoint(new Vector3(x_dir, y_dir, 0.0f)) - position;
+        direction = Camera.main.ViewportToWorldPoint(new Vector3(x_dir, y_dir, 0.0f)) - position;
         direction.z = 0.0f;
         direction.Normalize();
+    }
+
+    void GenerateAsteroid()
+    {
+        Vector3 position;
+        Vector3 direction;
+        GenerateCornerPositionAndDirection(out position, out direction);
 
         Asteroid asteroid = (Asteroid)GameObject.Instantiate(asteroid_prefab_, position, Quaternion.identity);
         float asteroid_speed = Random.Range(1, 11);
@@ -208,6 +223,27 @@ public class GameController : MonoBehaviour
         asteroid.rigidbody2D.AddTorque(torque);
     }
 
+    void GenerateUFO()
+    {
+        float chance = Random.Range(0.0f, 1.0f) * 100;
+        if (chance <= ufo_chance_)
+        {
+            Vector3 position;
+            Vector3 direction;
+            GenerateCornerPositionAndDirection(out position, out direction);
+            EnemyShip ufo = (EnemyShip)GameObject.Instantiate(ufo_prefab_, position, Quaternion.identity);
+            if ((num_generated_ufos_+1) % 3 == 0)
+            {              
+                ufo.GetComponent<EnemyShip>().SetSmall();
+            }
+            ufo.GetComponent<EnemyShip>().projectile_speed_ = ufo_projectile_speed_;
+            ufo.GetComponent<EnemyShip>().shooting_delay_ = ufo_shooting_delay_;            
+            float ufo_speed = Random.Range(min_ufo_speed_, max_ufo_speed_);
+            ufo.rigidbody2D.velocity = direction * (ufo_speed*50) * Time.deltaTime;
+            num_generated_ufos_++;
+        }
+    }
+
 
     void SpawnPlayer()
     {
@@ -219,31 +255,83 @@ public class GameController : MonoBehaviour
         info_text_.enabled = !info_text_.enabled;
     }
 
-    void CleanAsteroids()
+    void Clear()
     {
         GameObject[] asteroids = GameObject.FindGameObjectsWithTag("Asteroid");
         for (int i = 0; i < asteroids.Length; i++)
         {
             Destroy(asteroids[i]);
         }
+
+        GameObject[] ufos = GameObject.FindGameObjectsWithTag("EnemyShip");
+        for (int i = 0; i < ufos.Length; i++)
+        {
+            Destroy(ufos[i]);
+        }
     }
 
     void InitLevel()
-    {       
+    {
+        CancelInvoke("GenerateUFO");
         switch (current_level_)
-        {                
+        {
             case 1:
+                ufo_chance_ = 40.0f;
+                ufo_delay_ = 10.0f;
+                max_asteroids_ = 5;
+                max_asteroid_speed_ = 5;
+                min_asteroid_speed_ = 1;
+                max_ufo_speed_ = 5;
+                min_ufo_speed_ = 1;
+                ufo_projectile_speed_ = 400;
+                ufo_shooting_delay_ = 2;
                 break;
+            case 2:
+                ufo_chance_ = 50.0f;
+                ufo_delay_ = 8.0f;
+                max_asteroids_ = 6;
+
+                max_asteroid_speed_ = 5;
+                min_asteroid_speed_ = 2;
+                max_ufo_speed_ = 5;
+                min_ufo_speed_ = 2;
+
+                ufo_projectile_speed_ = 500;
+                ufo_shooting_delay_ = 1.5f;
+                break;
+            case 3:
+                ufo_chance_ = 60.0f;
+                ufo_delay_ = 6.0f;
+                max_asteroids_ = 7;
+
+                max_asteroid_speed_ = 6;
+                min_asteroid_speed_ = 2;
+                max_ufo_speed_ = 6;
+                min_ufo_speed_ = 2;
+
+                ufo_projectile_speed_ = 550;
+                ufo_shooting_delay_ = 1.0f;
+                break;            
             default:
+                ufo_chance_+=5;
                 max_asteroids_++;
+                ufo_delay_ -= 0.5f;
+
+                max_asteroid_speed_++;
+                min_asteroid_speed_++;
+                max_ufo_speed_++;
+                min_ufo_speed_++;
+                ufo_projectile_speed_ += 10;
                 break;
+                                
         }
-        for(int i = 0; i < max_asteroids_; i++)
+        InvokeRepeating("GenerateUFO", 0.0f, ufo_delay_);
+        for (int i = 0; i < max_asteroids_; i++)
         {
             GenerateAsteroid();
         }
     }
-    
+
     //STATE FUNCTIONS
     void OnMainMenu()
     {
@@ -266,18 +354,18 @@ public class GameController : MonoBehaviour
             }
             SpawnPlayer();
             CancelInvoke("BlinkInfoText");
-            current_state_ = GAME_STATE.LEVEL_STARTING;            
+            current_state_ = GAME_STATE.LEVEL_STARTING;
         }
     }
 
     void OnLevelStarting()
     {
-        CleanAsteroids();
+        Clear();
         InitLevel();
         music_player_instance_.GetComponent<MusicPlayer>().Reset();
         music_player_instance_.GetComponent<MusicPlayer>().Play();
 
-        current_state_ = GAME_STATE.PLAYING;    
+        current_state_ = GAME_STATE.PLAYING;
     }
 
     void OnPlaying()
@@ -291,7 +379,7 @@ public class GameController : MonoBehaviour
         {
             music_player_instance_.GetComponent<MusicPlayer>().Stop();
             current_state_ = GAME_STATE.LEVEL_FINISHED;
-        }           
+        }
     }
 
     void OnLevelFinished()
@@ -345,7 +433,7 @@ public class GameController : MonoBehaviour
         info_text_.text = "GAME OVER";
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            CleanAsteroids();
+            Clear();
             current_score_text_.text = "0";
             current_state_ = GAME_STATE.MAIN_MENU;
         }

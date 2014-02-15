@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\Asteroid.cs" />
      <Compile Include="Assets\Scripts\DestroyParticleSystem.cs" />
+     <Compile Include="Assets\Scripts\EnemyShip.cs" />
      <Compile Include="Assets\Scripts\GameController.cs" />
      <Compile Include="Assets\Scripts\HyperspaceAnim.cs" />
      <Compile Include="Assets\Scripts\MusicPlayer.cs" />
