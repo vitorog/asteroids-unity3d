@@ -15,7 +15,7 @@ public class HighScoresController : MonoBehaviour {
     private List<string> high_scores_initials_;
     private List<GameObject> gui_letters_;
     private List<char> letters_;
-    private List<GameObject> high_scores_text_;
+    private GameObject high_scores_text_;
     private int letter_index_ = 0;
     private int num_letters_ = 3;
     private int max_num_scores_ = 10;
@@ -32,8 +32,7 @@ public class HighScoresController : MonoBehaviour {
     {
         high_scores_ = high_scores;
         high_scores_initials_ = high_scores_initials;
-        gui_letters_ = new List<GameObject>();
-        high_scores_text_ = new List<GameObject>();
+        gui_letters_ = new List<GameObject>();        
         letters_ = new List<char>();
         for (int i = 0; i < 3; i++)
         {
@@ -47,25 +46,12 @@ public class HighScoresController : MonoBehaviour {
             gui_letters_.Add(letter);
             letters_.Add('A');
         }
-        for (int i = 0; i < max_num_scores_; i++)
-        {
-            GameObject high_score_text = new GameObject();
-            high_score_text.transform.parent = transform;
-            high_score_text.AddComponent<GUIText>();
-            high_score_text.GetComponent<GUIText>().alignment = TextAlignment.Center;
-            high_score_text.GetComponent<GUIText>().anchor = TextAnchor.MiddleCenter;
 
-            high_scores_text_.Add(high_score_text);           
-        }
-
-        if (high_scores_.Count < max_num_scores_)
-        {
-            for (int i = high_scores_.Count; i < max_num_scores_; i++)
-            {
-                high_scores_.Add(0);
-                high_scores_initials_.Add("AAA");
-            }
-        }
+        high_scores_text_ = new GameObject();
+        high_scores_text_.transform.parent = transform;
+        high_scores_text_.AddComponent<GUIText>();
+        high_scores_text_.GetComponent<GUIText>().alignment = TextAlignment.Center;
+        high_scores_text_.GetComponent<GUIText>().anchor = TextAnchor.MiddleCenter;        
 
         info_text_ = new GameObject();
         info_text_.AddComponent<GUIText>();
@@ -96,8 +82,7 @@ public class HighScoresController : MonoBehaviour {
 
     // Use this for initialization
     void Start()
-    {
-
+    {       
     }
 	
 	// Update is called once per frame
@@ -166,9 +151,9 @@ public class HighScoresController : MonoBehaviour {
             high_scores_.Add(current_score_);
             
             //Lazy sort, but  since the max number of scores is only 10, no problem... :p
-            for (int i = 0; i < max_num_scores_; i++)
+            for (int i = 0; i < high_scores_.Count; i++)
             {
-                for (int j = i+1; j < max_num_scores_; j++)
+                for (int j = i+1; j < high_scores_.Count; j++)
                 {                    
                     if (high_scores_[j] > high_scores_[i])
                     {                        
@@ -195,13 +180,25 @@ public class HighScoresController : MonoBehaviour {
     public void OnScoresDisplay()
     {
         info_text_.guiText.text = "HIGH SCORES";
+        info_text_.transform.position = new Vector3(0.5f, 0.6f, 0.0f);
+        
+        high_scores_text_.transform.position = new Vector3(0.5f, 0.5f - (0 * 0.03f), 0.0f);
+        float max_value = 100000.0f;
+        string text = "";
         for (int i = 0; i < high_scores_.Count; i++)
         {
             int index = i+1;
-            string text = index.ToString() + " " + high_scores_initials_[i] + " " + high_scores_[i].ToString();
-            high_scores_text_[i].guiText.text = text;
-            high_scores_text_[i].transform.position = new Vector3(0.5f, 0.5f - (i * 0.03f), 0.0f);
+            text += index.ToString() + "\t\t\t\t\t\t\t\t" + high_scores_initials_[i] + "\t\t\t\t\t\t\t\t";
+            int pads = Mathf.FloorToInt(Mathf.Log10(max_value / high_scores_[i])) + 1;
+            //Bad alignment solution... maybe learn how to use gui styles later...
+            for (int j = 0; j < pads; j++)
+            {
+                text += " ";
+            }           
+            text+=high_scores_[i].ToString();
+            text += "\n";
         }
+        high_scores_text_.guiText.text = text;
         if (Input.GetKeyDown(KeyCode.Space))
         {
             done_ = true;
