@@ -42,7 +42,7 @@ public class PlayerShip : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
+    {        
         if (!on_hyperspace_)
         {
             transform.Rotate(Vector3.forward * ((-1) * Input.GetAxis("Horizontal") * rotate_speed_ * Time.deltaTime));

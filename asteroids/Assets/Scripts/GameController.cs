@@ -131,7 +131,7 @@ public class GameController : MonoBehaviour
             case GAME_STATE.PLAYER_DESTROYED:
                 OnPlayerDestroyed();
                 break;
-            case GAME_STATE.HIGH_SCORES:
+            case GAME_STATE.HIGH_SCORES:                
                 OnHighScores();
                 break;
             case GAME_STATE.GAME_OVER:
@@ -402,7 +402,7 @@ public class GameController : MonoBehaviour
         {
             current_state_ = GAME_STATE.PLAYER_DESTROYED;
         }
-        if (GameObject.FindGameObjectsWithTag("Asteroid").Length == 0)
+        if (GameObject.FindGameObjectsWithTag("Asteroid").Length == 0 && GameObject.FindGameObjectsWithTag("EnemyShip").Length == 0)
         {
             music_player_instance_.GetComponent<MusicPlayer>().Stop();
             current_state_ = GAME_STATE.LEVEL_FINISHED;

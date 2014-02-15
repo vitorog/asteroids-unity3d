@@ -42,7 +42,7 @@ public class HighScoresController : MonoBehaviour {
             letter.GetComponent<GUIText>().text = "A";
             letter.transform.position = new Vector3(0.5f + (i * 0.015f), 0.5f, 0.0f);
             letter.GetComponent<GUIText>().alignment = TextAlignment.Center;
-            letter.GetComponent<GUIText>().anchor = TextAnchor.MiddleCenter;
+            letter.GetComponent<GUIText>().anchor = TextAnchor.UpperCenter;
             gui_letters_.Add(letter);
             letters_.Add('A');
         }
@@ -61,7 +61,7 @@ public class HighScoresController : MonoBehaviour {
         info_text_.transform.position = new Vector3(0.5f, 0.75f, 0.0f);
 
         InvokeRepeating("BlinkLetter", 0.25f, 0.25f);
-        current_score_ = GameObject.Find("GameController").GetComponent<GameController>().GetScore();
+        current_score_ = GameObject.Find("GameController").GetComponent<GameController>().GetScore();        
         if (high_scores_.Count == max_num_scores_ && current_score_ < high_scores_[high_scores_.Count - 1])
         {
             current_state_ = HIGH_SCORES_STATE.SCORES_DISPLAY;            
@@ -82,7 +82,17 @@ public class HighScoresController : MonoBehaviour {
 
     // Use this for initialization
     void Start()
-    {       
+    {
+        //List<int> scores = new List<int>();
+        //List<string> scores_initials = new List<string>();
+        //for (int i = 0; i < 10; i++)
+        //{
+        //    scores.Add(10);
+
+        //    scores_initials.Add("AAA");
+        //}
+        //Init(scores, scores_initials);
+
     }
 	
 	// Update is called once per frame
@@ -179,12 +189,11 @@ public class HighScoresController : MonoBehaviour {
 
     public void OnScoresDisplay()
     {
-        info_text_.guiText.text = "HIGH SCORES";
-        info_text_.transform.position = new Vector3(0.5f, 0.6f, 0.0f);
+        info_text_.guiText.text = "";        
         
-        high_scores_text_.transform.position = new Vector3(0.5f, 0.5f - (0 * 0.03f), 0.0f);
+        high_scores_text_.transform.position = new Vector3(0.5f, 0.5f, 0.0f);
         float max_value = 100000.0f;
-        string text = "";
+        string text = "HIGH SCORES\n\n";
         for (int i = 0; i < high_scores_.Count; i++)
         {
             int index = i+1;
