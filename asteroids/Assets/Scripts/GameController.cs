@@ -396,7 +396,10 @@ public class GameController : MonoBehaviour
         InitLevel();
         music_player_instance_.GetComponent<MusicPlayer>().Reset();
         music_player_instance_.GetComponent<MusicPlayer>().Play();
-        SpawnPlayer();
+        if (player_ship_intance_ == null)
+        {
+            SpawnPlayer();
+        }
         current_state_ = GAME_STATE.PLAYING;
     }
 
