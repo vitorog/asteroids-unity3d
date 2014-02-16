@@ -23,13 +23,14 @@ public class GameController : MonoBehaviour
     public GameObject music_player_prefab_;
     public GameObject high_scores_controller_prefab_;
   
-    public float score_to_life_rate_;
+    public int score_to_life_rate_;
     public float seconds_to_respawn_;
     public float hud_life_distance_;
     public float blinking_delay_;
     public float max_asteroid_torque_;
     public float min_asteroid_torque_;
 
+    private int next_score_to_life_;
     private float ufo_projectile_speed_;
     private float ufo_shooting_delay_;
     private float ufo_delay_;
@@ -63,11 +64,11 @@ public class GameController : MonoBehaviour
     {
         current_score_ += score;
         current_score_text_.text = current_score_.ToString();
-        if (current_score_ >= score_to_life_rate_)
+        if (current_score_ >= next_score_to_life_)
         {
             num_lives_++;
             AddLifeHUD();
-            score_to_life_rate_ += score_to_life_rate_;
+            next_score_to_life_ += score_to_life_rate_;
         }
     }
 
@@ -378,6 +379,7 @@ public class GameController : MonoBehaviour
             current_score_ = 0;
             current_score_text_.text = "0";
             num_lives_ = 3;
+            next_score_to_life_ = score_to_life_rate_;
             for (int i = 0; i < num_lives_; i++)
             {
                 AddLifeHUD();
