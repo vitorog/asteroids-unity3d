@@ -14,12 +14,11 @@ public class HighScoresController : MonoBehaviour {
     private List<int> high_scores_;
     private List<string> high_scores_initials_;
     private List<GameObject> gui_letters_;
-    private List<char> letters_;
-    private GameObject high_scores_text_;
+    private List<char> letters_;    
     private int letter_index_ = 0;
     private int num_letters_ = 3;
     private int max_num_scores_ = 10;
-    private HIGH_SCORES_STATE current_state_ = HIGH_SCORES_STATE.INITIALS_INPUT;
+    private HIGH_SCORES_STATE current_state_;
     private bool done_;
     private GameObject info_text_;
 
@@ -32,44 +31,42 @@ public class HighScoresController : MonoBehaviour {
     {
         high_scores_ = high_scores;
         high_scores_initials_ = high_scores_initials;
-        gui_letters_ = new List<GameObject>();        
-        letters_ = new List<char>();
-        for (int i = 0; i < 3; i++)
-        {
-            GameObject letter = new GameObject();
-            letter.transform.parent = transform;
-            letter.AddComponent<GUIText>();
-            letter.GetComponent<GUIText>().text = "A";
-            letter.transform.position = new Vector3(0.5f + (i * 0.015f), 0.5f, 0.0f);
-            letter.GetComponent<GUIText>().alignment = TextAlignment.Center;
-            letter.GetComponent<GUIText>().anchor = TextAnchor.UpperCenter;
-            gui_letters_.Add(letter);
-            letters_.Add('A');
-        }
-
-        high_scores_text_ = new GameObject();
-        high_scores_text_.transform.parent = transform;
-        high_scores_text_.AddComponent<GUIText>();
-        high_scores_text_.GetComponent<GUIText>().alignment = TextAlignment.Center;
-        high_scores_text_.GetComponent<GUIText>().anchor = TextAnchor.MiddleCenter;        
-
+        
         info_text_ = new GameObject();
         info_text_.AddComponent<GUIText>();
         info_text_.GetComponent<GUIText>().alignment = TextAlignment.Center;
         info_text_.GetComponent<GUIText>().anchor = TextAnchor.MiddleCenter;
         info_text_.transform.parent = transform;
         info_text_.transform.position = new Vector3(0.5f, 0.75f, 0.0f);
-
-        InvokeRepeating("BlinkLetter", 0.25f, 0.25f);
+        
         current_score_ = GameObject.Find("GameController").GetComponent<GameController>().GetScore();        
         if (high_scores_.Count == max_num_scores_ && current_score_ < high_scores_[high_scores_.Count - 1])
-        {
+        {        
             current_state_ = HIGH_SCORES_STATE.SCORES_DISPLAY;            
-            info_text_.guiText.text = "HIGH SCORES";
         }
         else
-        {            
+        {
+            gui_letters_ = new List<GameObject>();
+            letters_ = new List<char>();
+            for (int i = 0; i < 3; i++)
+            {
+                GameObject letter = new GameObject();
+                letter.transform.parent = transform;
+                letter.AddComponent<GUIText>();
+                letter.GetComponent<GUIText>().text = "A";
+                letter.transform.position = new Vector3(0.5f + (i * 0.015f), 0.5f, 0.0f);
+                letter.GetComponent<GUIText>().alignment = TextAlignment.Center;
+                letter.GetComponent<GUIText>().anchor = TextAnchor.UpperCenter;
+                gui_letters_.Add(letter);
+                letters_.Add('A');
+            }
             info_text_.guiText.text = "YOU BEAT A HIGH SCORE! ENTER YOUR INITIALS! (PRESS SPACE TO CONFIRM)";
+            for (int i = 0; i < num_letters_; i++)
+            {
+                gui_letters_[i].guiText.enabled = true;
+            }
+            InvokeRepeating("BlinkLetter", 0.25f, 0.25f);
+            current_state_ = HIGH_SCORES_STATE.INITIALS_INPUT;            
         }
         done_ = false;
     }
@@ -83,16 +80,6 @@ public class HighScoresController : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        //List<int> scores = new List<int>();
-        //List<string> scores_initials = new List<string>();
-        //for (int i = 0; i < 10; i++)
-        //{
-        //    scores.Add(10);
-
-        //    scores_initials.Add("AAA");
-        //}
-        //Init(scores, scores_initials);
-
     }
 	
 	// Update is called once per frame
@@ -100,7 +87,7 @@ public class HighScoresController : MonoBehaviour {
     {
         switch (current_state_)
         {
-            case HIGH_SCORES_STATE.INITIALS_INPUT:
+            case HIGH_SCORES_STATE.INITIALS_INPUT:                
                 OnInitialsInput();
                 break;
             case HIGH_SCORES_STATE.SCORES_DISPLAY:
@@ -112,8 +99,7 @@ public class HighScoresController : MonoBehaviour {
     public void OnInitialsInput()
     {        
         if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            gui_letters_[letter_index_].gameObject.guiText.enabled = true;
+        {            
             letter_index_++;
             if (letter_index_ >= num_letters_)
             {
@@ -121,8 +107,7 @@ public class HighScoresController : MonoBehaviour {
             }
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            gui_letters_[letter_index_].gameObject.guiText.enabled = true;
+        {            
             letter_index_--;
             if (letter_index_ < 0)
             {
@@ -130,8 +115,7 @@ public class HighScoresController : MonoBehaviour {
             }
         }
         if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            gui_letters_[letter_index_].gameObject.guiText.enabled = true;
+        {            
             letters_[letter_index_]++;
             if (letters_[letter_index_] > 90)
             {
@@ -140,8 +124,7 @@ public class HighScoresController : MonoBehaviour {
             gui_letters_[letter_index_].guiText.text = letters_[letter_index_].ToString();
         }
         if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            gui_letters_[letter_index_].gameObject.guiText.enabled = true;
+        {            
             letters_[letter_index_]--;
             if (letters_[letter_index_] < 65)
             {
@@ -180,7 +163,7 @@ public class HighScoresController : MonoBehaviour {
             }
             for (int i = 0; i < num_letters_; i++)
             {
-                gui_letters_[i].guiText.enabled = false;
+                Destroy(gui_letters_[i]);
             }
             CancelInvoke("BlinkLetter");
             current_state_ = HIGH_SCORES_STATE.SCORES_DISPLAY;
@@ -188,10 +171,8 @@ public class HighScoresController : MonoBehaviour {
     }
 
     public void OnScoresDisplay()
-    {
-        info_text_.guiText.text = "";        
-        
-        high_scores_text_.transform.position = new Vector3(0.5f, 0.5f, 0.0f);
+    {        
+        info_text_.transform.position = new Vector3(0.5f, 0.5f, 0.0f);
         float max_value = 100000.0f;
         string text = "HIGH SCORES\n\n";
         for (int i = 0; i < high_scores_.Count; i++)
@@ -207,7 +188,7 @@ public class HighScoresController : MonoBehaviour {
             text+=high_scores_[i].ToString();
             text += "\n";
         }
-        high_scores_text_.guiText.text = text;
+        info_text_.guiText.text = text;
         if (Input.GetKeyDown(KeyCode.Space))
         {
             done_ = true;

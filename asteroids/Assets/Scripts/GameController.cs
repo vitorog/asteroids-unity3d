@@ -109,7 +109,7 @@ public class GameController : MonoBehaviour
         music_player_instance_ = (GameObject)Instantiate(music_player_prefab_);        
 
         high_scores_initials_ = new List<string>();
-        high_scores_ = new List<int>();
+        high_scores_ = new List<int>();      
     }
 
     // Update is called once per frame
@@ -383,8 +383,7 @@ public class GameController : MonoBehaviour
             for (int i = 0; i < num_lives_; i++)
             {
                 AddLifeHUD();
-            }
-            SpawnPlayer();
+            }            
             CancelInvoke("BlinkInfoText");
             current_state_ = GAME_STATE.LEVEL_STARTING;
         }
@@ -396,7 +395,7 @@ public class GameController : MonoBehaviour
         InitLevel();
         music_player_instance_.GetComponent<MusicPlayer>().Reset();
         music_player_instance_.GetComponent<MusicPlayer>().Play();
-
+        SpawnPlayer();
         current_state_ = GAME_STATE.PLAYING;
     }
 
@@ -457,15 +456,16 @@ public class GameController : MonoBehaviour
     {        
         info_text_.enabled = true;
         info_text_.text = "GAME OVER";
+        CancelInvoke("GenerateUFO");
         if (Input.GetKeyDown(KeyCode.Space))
-        {         
+        {
+            Clear();
             current_state_ = GAME_STATE.HIGH_SCORES;
         }
     }
 
     void OnHighScores()
-    {
-        Clear();
+    {        
         if (high_scores_controller_instance_ == null)
         {
             high_scores_controller_instance_ = (GameObject)Instantiate(high_scores_controller_prefab_);
