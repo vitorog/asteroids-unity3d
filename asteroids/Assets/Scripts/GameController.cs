@@ -145,6 +145,7 @@ public class GameController : MonoBehaviour
     {
         float shift = hud_player_lives_.Count * hud_life_distance_;
         GameObject hud_life = (GameObject)GameObject.Instantiate(hud_player_life_prefab_);
+        Camera.main.GetComponent<PlayerShipRenderer>().AddObject(hud_life);
         Vector3 position = Camera.main.ViewportToWorldPoint(new Vector3(0.08f + shift, 0.9f, 0.0f));
         position.z = 0.0f;
         hud_life.transform.position = position;

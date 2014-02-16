@@ -47,8 +47,10 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Asteroid.cs" />
+     <Compile Include="Assets\Scripts\AsteroidRenderer.cs" />
      <Compile Include="Assets\Scripts\DestroyParticleSystem.cs" />
      <Compile Include="Assets\Scripts\EnemyShip.cs" />
+     <Compile Include="Assets\Scripts\EnemyShipRenderer.cs" />
      <Compile Include="Assets\Scripts\GameController.cs" />
      <Compile Include="Assets\Scripts\HighScoresController.cs" />
      <Compile Include="Assets\Scripts\HyperspaceAnim.cs" />
@@ -56,6 +58,7 @@
      <Compile Include="Assets\Scripts\PlayerShip.cs" />
      <Compile Include="Assets\Scripts\PlayerShipRenderer.cs" />
      <Compile Include="Assets\Scripts\Projectile.cs" />
+     <Compile Include="Assets\Scripts\ProjectileRenderer.cs" />
      <Compile Include="Assets\Scripts\ScreenCornerDetector.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

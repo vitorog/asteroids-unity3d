@@ -15,13 +15,13 @@ public class HyperspaceAnim : MonoBehaviour
         }
         else
         {
-            transform.localScale = new Vector3(0.00015f, 0.00025f, 1.0f);
+            transform.localScale = new Vector3(0.0f, 0.0f, 1.0f);
             InvokeRepeating("Grow", 1.0f, 0.02f);
-            GetComponent<ParticleSystem>().enableEmission = false;
-            GetComponent<PlayerShipRenderer>().enabled = false;
+            GetComponent<ParticleSystem>().enableEmission = false;            
         }
         shrink_sound_played_ = false;
         grow_sound_played_ = false;
+        Camera.main.GetComponent<PlayerShipRenderer>().AddObject(gameObject);
     }
 
     // Use this for initialization
@@ -68,13 +68,11 @@ public class HyperspaceAnim : MonoBehaviour
     {
         if (!grow_sound_played_)
         {
+            transform.localScale = new Vector3(0.00015f, 0.00025f, 1.0f); //This should be set in the first time the Grow function is called
+
             GetComponents<AudioSource>()[1].Play();
             grow_sound_played_ = true;
-        }
-        if (!GetComponent<PlayerShipRenderer>().enabled)
-        {
-            GetComponent<PlayerShipRenderer>().enabled = true;
-        }
+        }    
         transform.localScale = transform.localScale * 1.2f;
     }
 }

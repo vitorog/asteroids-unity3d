@@ -31,13 +31,18 @@ public class PlayerShip : MonoBehaviour
         thrust_particles_instance_ = (ParticleSystem)Instantiate(thrust_particles_prefab_);
         thrust_particles_instance_.enableEmission = false;
         thrust_particles_instance_.transform.parent = transform;
-        
-        
+
+        Camera.main.GetComponent<PlayerShipRenderer>().AddPlayerShip(this);            
     }
 
     public bool IsPlayerAlive()
     {       
         return alive_;
+    }
+
+    public bool IsOnHyperspace()
+    {
+        return on_hyperspace_;
     }
 
     // Update is called once per frame
@@ -62,8 +67,7 @@ public class PlayerShip : MonoBehaviour
                 hyperspace_timer_ += Time.deltaTime;
                 if (hyperspace_timer_ > hyperspace_duration_)
                 {
-                    on_hyperspace_ = false;
-                    gameObject.GetComponent<PlayerShipRenderer>().enabled = true;
+                    on_hyperspace_ = false;                    
                     gameObject.GetComponent<BoxCollider2D>().enabled = true;                    
 
                     float chance = Random.Range(0.0f, 1.0f);
@@ -90,18 +94,7 @@ public class PlayerShip : MonoBehaviour
                 rigid_body_.drag = 0.0f;
                 thrust_particles_instance_.transform.position = transform.position;
                 thrust_particles_instance_.transform.localPosition = new Vector3(0.0f, -1.0f, 0.0f);
-                thrust_particles_instance_.enableEmission = true;
-                //ParticleSystem.Particle[] particles = new ParticleSystem.Particle[thrust_particles_instance_.particleCount];
-                //thrust_particles_instance_.GetParticles(particles);
-                //for (int i = 0; i < thrust_particles_instance_.particleCount; i++)
-                //{
-                //    ParticleSystem.Particle p = particles[i];
-                //    p.velocity = -transform.up;                
-                //}
-                //if (!gameObject.GetComponent<AudioSource>().isPlaying)
-                //{
-                //    gameObject.GetComponent<AudioSource>().Play();
-                //}
+                thrust_particles_instance_.enableEmission = true;                
                 if (!gameObject.GetComponents<AudioSource>()[1].isPlaying)
                 {
                     gameObject.GetComponents<AudioSource>()[1].Play();
@@ -150,8 +143,7 @@ public class PlayerShip : MonoBehaviour
         Vector3 pos = Camera.main.ViewportToWorldPoint(new Vector3(x, y, 0.0f));
         pos.z = 0.0f;
         transform.position = pos;
-        on_hyperspace_ = true;
-        gameObject.GetComponent<PlayerShipRenderer>().enabled = false;
+        on_hyperspace_ = true;        
         gameObject.GetComponent<BoxCollider2D>().enabled = false;
         hyperspace_timer_ = 0.0f;
 

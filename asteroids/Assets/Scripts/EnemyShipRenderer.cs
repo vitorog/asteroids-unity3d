@@ -2,55 +2,51 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class PlayerShipRenderer : MonoBehaviour
-{
-    private List<GameObject> ships_; //Objects to be rendered
+public class EnemyShipRenderer : MonoBehaviour {
+
+    private List<EnemyShip> enemy_ships_;
     private Material line_material_;
     private List<Vector3> vertices_;
     private Color line_color_;
     private Color square_color_;
-    private PlayerShip player_ship_instance_;
-    private int player_ship_index_;
 
-
-    //This function is used for the HUD lives
-    public void AddObject(GameObject ship)
+    public void AddEnemyShip(EnemyShip enemy_ship)
     {
-        ships_.Add(ship);
+        enemy_ships_.Add(enemy_ship);
     }
 
-    //This function is used for the player controllable ship
-    public void AddPlayerShip(PlayerShip player_ship)
-    {        
-        player_ship_instance_ = player_ship;
-        ships_.Add(player_ship.gameObject);
-        player_ship_index_ = ships_.Count - 1;
-    }  
-    
-    void Awake()
-    {
-        ships_ = new List<GameObject>();
+	// Use this for initialization
+	void Awake () {
+        enemy_ships_ = new List<EnemyShip>();
         CreateLineMaterial();
-        Vector3 p1 = new Vector3(-1.0f, -1.0f, 0.0f);
-        Vector3 p2 = new Vector3(0.0f, 1.0f, 0.0f);
-        Vector3 p3 = new Vector3(1.0f, -1.0f, 0.0f);
-        Vector3 p4 = new Vector3(0.5f, -0.75f, 0.0f);
-        Vector3 p5 = new Vector3(-0.5f, -0.75f, 0.0f);
+        Vector3 p1 = new Vector3(-0.5f, -1.0f, 0.0f);
+        Vector3 p2 = new Vector3(-1.0f, -0.25f, 0.0f);
+        Vector3 p3 = new Vector3(-0.5f, 0.25f, 0.0f);
+        Vector3 p4 = new Vector3(-0.25f, 1.0f, 0.0f);
+        Vector3 p5 = new Vector3(0.25f, 1.0f, 0.0f);
+        Vector3 p6 = new Vector3(0.5f, 0.25f, 0.0f);
+        Vector3 p7 = new Vector3(1.0f, -0.25f, 0.0f);
+        Vector3 p8 = new Vector3(0.5f, -1.0f, 0.0f);
+
+
         vertices_ = new List<Vector3>();
         vertices_.Add(p1);
         vertices_.Add(p2);
         vertices_.Add(p3);
         vertices_.Add(p4);
         vertices_.Add(p5);
+        vertices_.Add(p6);
+        vertices_.Add(p7);
+        vertices_.Add(p8);
 
         line_color_ = new Color(1.0f, 1.0f, 1.0f, 1.0f);
-        square_color_ = new Color(1.0f, 1.0f, 1.0f, 1.0f);        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {        
-    }    
+        square_color_ = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+	
+	// Update is called once per frame
+	void Update () {
+	
+	}
 
     void CreateLineMaterial()
     {
@@ -66,33 +62,25 @@ public class PlayerShipRenderer : MonoBehaviour
             line_material_.hideFlags = HideFlags.HideAndDontSave;
             line_material_.shader.hideFlags = HideFlags.HideAndDontSave;
         }
-    }  
-
-    void OnPostRender()
-    {        
-        for (int i = 0; i < ships_.Count; i++)
-        {
-            if (ships_[i] != null)
-            {
-                if (i == player_ship_index_ && player_ship_instance_.IsOnHyperspace())
-                {
-                    continue;    
-                }
-                RenderShip(ships_[i]);                
-            }          
-        }        
-        ships_.RemoveAll(obj => obj == null);
-        if (player_ship_instance_ == null)
-        {
-            player_ship_index_ = -1;
-        }
     }
 
-    void RenderShip(GameObject obj)
+    void OnPostRender()
+    {
+        for (int i = 0; i < enemy_ships_.Count; i++)
+        {
+            if (enemy_ships_[i] != null)
+            {
+                RenderShip(enemy_ships_[i]);
+            }
+        }
+        enemy_ships_.RemoveAll(enemy_ship => enemy_ship == null);
+    }
+
+    void RenderShip(EnemyShip enemy_ship)
     {
         line_material_.SetPass(0);
         GL.PushMatrix();
-        Matrix4x4 trs_matrix = Matrix4x4.TRS(obj.transform.position, obj.transform.rotation, obj.transform.localScale);
+        Matrix4x4 trs_matrix = Matrix4x4.TRS(enemy_ship.gameObject.transform.position, enemy_ship.gameObject.transform.rotation, enemy_ship.gameObject.transform.localScale);
         GL.MultMatrix(trs_matrix);
         //DrawBoundingBox();
         DrawLines();
@@ -113,6 +101,11 @@ public class PlayerShipRenderer : MonoBehaviour
             }
         }
         GL.Vertex(vertices_[0]);
+        GL.Vertex(vertices_[1]);
+        GL.Vertex(vertices_[6]);
+
+        GL.Vertex(vertices_[2]);
+        GL.Vertex(vertices_[5]);
         GL.End();
     }
 
