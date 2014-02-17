@@ -22,13 +22,14 @@ public class GameController : MonoBehaviour
     public EnemyShip ufo_prefab_;
     public GameObject music_player_prefab_;
     public GameObject high_scores_controller_prefab_;
-  
+
     public int score_to_life_rate_;
     public float seconds_to_respawn_;
     public float hud_life_distance_;
     public float blinking_delay_;
     public float max_asteroid_torque_;
     public float min_asteroid_torque_;
+    public float minimum_respawn_safe_distance_;
 
     private int next_score_to_life_;
     private float ufo_projectile_speed_;
@@ -57,7 +58,7 @@ public class GameController : MonoBehaviour
     private GameObject high_scores_controller_instance_;
     private List<int> high_scores_;
     private List<string> high_scores_initials_;
-    private int max_num_high_scores_;    
+    private int max_num_high_scores_;
 
     //PUBLIC FUNCTIONS
     public void AddScore(int score)
@@ -106,10 +107,10 @@ public class GameController : MonoBehaviour
         current_state_ = GAME_STATE.MAIN_MENU;
         hud_player_lives_ = new List<GameObject>();
 
-        music_player_instance_ = (GameObject)Instantiate(music_player_prefab_);        
+        music_player_instance_ = (GameObject)Instantiate(music_player_prefab_);
 
         high_scores_initials_ = new List<string>();
-        high_scores_ = new List<int>();      
+        high_scores_ = new List<int>();
     }
 
     // Update is called once per frame
@@ -132,7 +133,7 @@ public class GameController : MonoBehaviour
             case GAME_STATE.PLAYER_DESTROYED:
                 OnPlayerDestroyed();
                 break;
-            case GAME_STATE.HIGH_SCORES:                
+            case GAME_STATE.HIGH_SCORES:
                 OnHighScores();
                 break;
             case GAME_STATE.GAME_OVER:
@@ -152,9 +153,12 @@ public class GameController : MonoBehaviour
         hud_player_lives_.Add(hud_life);
     }
 
-    void GenerateCornerPositionAndDirection(out Vector3 position, out Vector3 direction)
+    int GenerateCornerPositionAndDirection(out Vector3 position, out Vector3 direction, bool force_corner, int corner)
     {
-        int corner = Random.Range(1, 5); //1 = Left, 2 = Top, 3 = Right, 4 = Bottom        
+        if (!force_corner)
+        {
+            corner = Random.Range(1, 5); //1 = Left, 2 = Top, 3 = Right, 4 = Bottom        
+        }
         float x = 0.0f;
         float y = 0.0f;
         float x_dir = 0.0f;
@@ -213,13 +217,20 @@ public class GameController : MonoBehaviour
         direction = Camera.main.ViewportToWorldPoint(new Vector3(x_dir, y_dir, 0.0f)) - position;
         direction.z = 0.0f;
         direction.Normalize();
+        return corner;
     }
 
     void GenerateAsteroid()
     {
         Vector3 position;
         Vector3 direction;
-        GenerateCornerPositionAndDirection(out position, out direction);
+        int corner = GenerateCornerPositionAndDirection(out position, out direction, false, 0);
+        //Checks if the asteroid is gonna be spawned too close to the player
+        if (!IsSafeDistance(position))
+        {
+            int new_corner = (corner % 4) + 2;
+            GenerateCornerPositionAndDirection(out position, out direction, true, new_corner);
+        }
 
         Asteroid asteroid = (Asteroid)GameObject.Instantiate(asteroid_prefab_, position, Quaternion.identity);
         float asteroid_speed = Random.Range(1, 11);
@@ -245,16 +256,22 @@ public class GameController : MonoBehaviour
         {
             Vector3 position;
             Vector3 direction;
-            GenerateCornerPositionAndDirection(out position, out direction);
+            int corner = GenerateCornerPositionAndDirection(out position, out direction, false, 0);
+            //Checks if the UFO is gonna be spawned too close to the player
+            if (!IsSafeDistance(position))
+            {
+                int new_corner = (corner % 4) + 2;
+                GenerateCornerPositionAndDirection(out position, out direction, true, new_corner);
+            }            
             EnemyShip ufo = (EnemyShip)GameObject.Instantiate(ufo_prefab_, position, Quaternion.identity);
-            if ((num_generated_ufos_+1) % 3 == 0)
-            {              
+            if ((num_generated_ufos_ + 1) % 3 == 0)
+            {
                 ufo.GetComponent<EnemyShip>().SetSmall();
             }
             ufo.GetComponent<EnemyShip>().projectile_speed_ = ufo_projectile_speed_;
-            ufo.GetComponent<EnemyShip>().shooting_delay_ = ufo_shooting_delay_;            
+            ufo.GetComponent<EnemyShip>().shooting_delay_ = ufo_shooting_delay_;
             float ufo_speed = Random.Range(min_ufo_speed_, max_ufo_speed_);
-            ufo.rigidbody2D.velocity = direction * (ufo_speed*50) * Time.deltaTime;
+            ufo.rigidbody2D.velocity = direction * (ufo_speed * 50) * Time.deltaTime;
             num_generated_ufos_++;
         }
     }
@@ -327,9 +344,9 @@ public class GameController : MonoBehaviour
 
                 ufo_projectile_speed_ = 550;
                 ufo_shooting_delay_ = 1.0f;
-                break;            
+                break;
             default:
-                ufo_chance_+=5;
+                ufo_chance_ += 5;
                 max_asteroids_++;
                 ufo_delay_ -= 0.5f;
 
@@ -339,7 +356,7 @@ public class GameController : MonoBehaviour
                 min_ufo_speed_++;
                 ufo_projectile_speed_ += 10;
                 break;
-                                
+
         }
         InvokeRepeating("GenerateUFO", ufo_delay_, ufo_delay_);
         for (int i = 0; i < max_asteroids_; i++)
@@ -372,7 +389,7 @@ public class GameController : MonoBehaviour
             {
                 GenerateAsteroid();
             }
-            InvokeRepeating("GenerateUFO", ufo_delay_,ufo_delay_);
+            InvokeRepeating("GenerateUFO", ufo_delay_, ufo_delay_);
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -384,7 +401,7 @@ public class GameController : MonoBehaviour
             for (int i = 0; i < num_lives_; i++)
             {
                 AddLifeHUD();
-            }            
+            }
             CancelInvoke("BlinkInfoText");
             current_state_ = GAME_STATE.LEVEL_STARTING;
         }
@@ -447,7 +464,7 @@ public class GameController : MonoBehaviour
 
         music_player_instance_.GetComponent<MusicPlayer>().Stop();
         respawn_timer_ += Time.deltaTime;
-        if (respawn_timer_ > seconds_to_respawn_)
+        if (respawn_timer_ > seconds_to_respawn_ && IsSafeForRespawn())
         {
             SpawnPlayer();
             music_player_instance_.GetComponent<MusicPlayer>().Reset();
@@ -457,7 +474,7 @@ public class GameController : MonoBehaviour
     }
 
     void OnGameOver()
-    {        
+    {
         info_text_.enabled = true;
         info_text_.text = "GAME OVER";
         CancelInvoke("GenerateUFO");
@@ -469,18 +486,18 @@ public class GameController : MonoBehaviour
     }
 
     void OnHighScores()
-    {        
+    {
         if (high_scores_controller_instance_ == null)
         {
             high_scores_controller_instance_ = (GameObject)Instantiate(high_scores_controller_prefab_);
             high_scores_controller_instance_.GetComponent<HighScoresController>().Init(high_scores_, high_scores_initials_);
-        }        
+        }
         if (high_scores_controller_instance_.GetComponent<HighScoresController>().IsDone())
         {
             high_scores_controller_instance_.GetComponent<HighScoresController>().GetUpdatedHighScores(out high_scores_, out high_scores_initials_);
             Destroy(high_scores_controller_instance_);
             high_scores_controller_instance_ = null;
-            
+
             current_score_text_.text = "0";
             if (current_score_ > max_score_)
             {
@@ -490,6 +507,54 @@ public class GameController : MonoBehaviour
             }
 
             current_state_ = GAME_STATE.MAIN_MENU;
-        }        
+        }
     }
+
+    bool IsSafeForRespawn()
+    {
+        GameObject[] asteroids = GameObject.FindGameObjectsWithTag("Asteroid");
+        Vector3 respawn_position = new Vector3(0.0f, 0.0f, 0.0f);
+        for (int i = 0; i < asteroids.Length; i++)
+        {
+            Vector3 asteroid_position = asteroids[i].transform.position;
+            float distance = (asteroid_position - respawn_position).magnitude;
+            if (distance < minimum_respawn_safe_distance_)
+            {
+                return false;
+            }
+        }
+        GameObject[] enemy_ships = GameObject.FindGameObjectsWithTag("EnemyShip");
+        for (int i = 0; i < enemy_ships.Length; i++)
+        {
+            Vector3 enemy_ship_position = enemy_ships[i].transform.position;
+            float distance = (enemy_ship_position - respawn_position).magnitude;
+            if (distance < minimum_respawn_safe_distance_)
+            {
+                return false;
+            }
+        }
+        GameObject[] enemy_projectiles = GameObject.FindGameObjectsWithTag("EnemyProjectile");
+        for (int i = 0; i < enemy_projectiles.Length; i++)
+        {
+            Vector3 enemy_projectile_position = enemy_projectiles[i].transform.position;
+            float distance = (enemy_projectile_position - respawn_position).magnitude;
+            if (distance < minimum_respawn_safe_distance_)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    bool IsSafeDistance(Vector3 position)
+    {
+        if (player_ship_intance_ != null)
+        {
+            float distance = (player_ship_intance_.transform.position - position).magnitude;
+            return distance > minimum_respawn_safe_distance_;
+        }
+        return true;
+    }
+
 }
