@@ -74,12 +74,7 @@ public class ProjectileRenderer : MonoBehaviour {
         GL.Vertex3(half_size, half_size, 0.0f);
         GL.Vertex3(-half_size, half_size, 0.0f);
         GL.End();
-    }
-
-    void OnCollisionEnter2D(Collision2D c)
-    {
-        Destroy(gameObject);
-    }
+    }  
 
     void DrawBoundingBox()
     {
