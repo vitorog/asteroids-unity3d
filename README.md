@@ -14,10 +14,10 @@ The game can be played here: http://goo.gl/rG1drk
 
 --Audacity: http://audacity.sourceforge.net/
 
-![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/image1.png "Main Menu")
-![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/image2.png "In Game")
-![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/image3.png "In Game 2")
-![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/image4.png "In Game 3")
-![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/image5.png "Game Over")
-![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/image6.png "High Scores")
+![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/screenshots/image1.png "Main Menu")
+![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/screenshots/image2.png "In Game")
+![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/screenshots/image3.png "In Game 2")
+![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/screenshots/image4.png "In Game 3")
+![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/screenshots/image5.png "Game Over")
+![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/screenshots/image6.png "High Scores")
 
