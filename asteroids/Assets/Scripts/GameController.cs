@@ -264,7 +264,7 @@ public class GameController : MonoBehaviour
                 GenerateCornerPositionAndDirection(out position, out direction, true, new_corner);
             }            
             EnemyShip ufo = (EnemyShip)GameObject.Instantiate(ufo_prefab_, position, Quaternion.identity);
-            if ((num_generated_ufos_ + 1) % 3 == 0)
+            if ((num_generated_ufos_ + 1) % 4 == 0)
             {
                 ufo.GetComponent<EnemyShip>().SetSmall();
             }

@@ -20,14 +20,18 @@ public class EnemyShip : MonoBehaviour
  
     private float min_angle_;
     private float max_angle_;
-    private int score_;  
+    private int score_;
 
-    // Use this for initialization
-    void Start()
+    void Awake()
     {
         min_angle_ = big_ufo_min_angle_;
         max_angle_ = big_ufo_max_angle_;
         score_ = big_ufo_score_;
+    }
+
+    // Use this for initialization
+    void Start()
+    {       
         InvokeRepeating("Shoot", 1.0f, shooting_delay_);
         Camera.main.GetComponent<EnemyShipRenderer>().AddEnemyShip(this);
     }
