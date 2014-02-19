@@ -99,7 +99,11 @@ public class HighScoresController : MonoBehaviour {
     public void OnInitialsInput()
     {        
         if (Input.GetKeyDown(KeyCode.RightArrow))
-        {            
+        {
+            for (int i = 0; i < num_letters_; i++)
+            {
+                gui_letters_[i].guiText.enabled = true;
+            }
             letter_index_++;
             if (letter_index_ >= num_letters_)
             {
@@ -107,7 +111,11 @@ public class HighScoresController : MonoBehaviour {
             }
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {            
+        {
+            for (int i = 0; i < num_letters_; i++)
+            {
+                gui_letters_[i].guiText.enabled = true;
+            }
             letter_index_--;
             if (letter_index_ < 0)
             {
