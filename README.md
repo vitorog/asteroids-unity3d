@@ -3,6 +3,7 @@ asteroids-unity3d
 
 An Asteroids (Atari, 1979) clone made in Unity 3D as a learning experience.
 The game can be played here: http://goo.gl/rG1drk
+Gameplay video on Youtube: http://goo.gl/zOYPef
 
 -Graphic assets created with lines and squares, using Unity 3D's GL class
 
