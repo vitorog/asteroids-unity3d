@@ -87,11 +87,22 @@ public class Asteroid : MonoBehaviour
             child_asteroid_2.rigidbody2D.velocity = Quaternion.Euler(0, 0, 30) * rigidbody2D.velocity;
 
 
-        }
-        //This has to be disabled because the object will only be destroyed
-        //after the sound effect is finished
-        gameObject.GetComponent<BoxCollider2D>().enabled = false;            
-        Destroy(gameObject, gameObject.GetComponent<AudioSource>().clip.length);
+        }     
         is_alive_ = false;
-    }   
+    }
+
+    //Moved destruction code to LateUpdate function because it seems there is a problem 
+    //when handling collision between objects: if each object destroys itself, 
+    //sometimes only one of the OnCollisionEnter is called (Unity bug?)
+    //Not sure if it will work in all cases and could not find references...
+    void LateUpdate()
+    {
+        if (!is_alive_)
+        {
+            //This has to be disabled because the object will only be destroyed
+            //after the sound effect is finished
+            gameObject.GetComponent<BoxCollider2D>().enabled = false;
+            Destroy(gameObject, gameObject.GetComponent<AudioSource>().clip.length);
+        }
+    }
 }

@@ -22,6 +22,8 @@ public class EnemyShip : MonoBehaviour
     private float max_angle_;
     private int score_;
 
+    private bool is_alive_;
+
     void Awake()
     {
         min_angle_ = big_ufo_min_angle_;
@@ -31,7 +33,8 @@ public class EnemyShip : MonoBehaviour
 
     // Use this for initialization
     void Start()
-    {       
+    {
+        is_alive_ = true;
         InvokeRepeating("Shoot", 1.0f, shooting_delay_);
         Camera.main.GetComponent<EnemyShipRenderer>().AddEnemyShip(this);
     }
@@ -65,7 +68,7 @@ public class EnemyShip : MonoBehaviour
             {
                 GameObject.Find("GameController").GetComponent<GameController>().AddScore(score_);
             }
-            Destroy(gameObject);            
+            is_alive_ = false;           
         }
     }
 
@@ -90,6 +93,13 @@ public class EnemyShip : MonoBehaviour
         gameObject.GetComponents<AudioSource>()[0].Play();        
     }
 
+    //Moved destruction code to LateUpdate function because it seems there is a problem 
+    //when handling collision between objects: if each object destroys itself, 
+    //sometimes only one of the OnCollisionEnter is called (Unity bug?)
+    void LateUpdate()
+    {
+        Destroy(gameObject);
+    }
     
 
 }
