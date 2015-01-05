@@ -96,6 +96,7 @@ public class EnemyShip : MonoBehaviour
     //Moved destruction code to LateUpdate function because it seems there is a problem 
     //when handling collision between objects: if each object destroys itself, 
     //sometimes only one of the OnCollisionEnter is called (Unity bug?)
+    //Not sure if it will work in all cases and could not find references...
     void LateUpdate()
     {
         Destroy(gameObject);
