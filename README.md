@@ -1,4 +1,4 @@
-asteroids-unity3d
+Asteroids - Unity 3D
 =================
 
 An Asteroids (Atari, 1979) clone made in Unity 3D as a learning experience.
@@ -17,7 +17,5 @@ Gameplay video on Youtube: http://goo.gl/zOYPef
 ![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/screenshots/image1.png "Main Menu")
 ![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/screenshots/image2.png "In Game")
 ![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/screenshots/image3.png "In Game 2")
-![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/screenshots/image4.png "In Game 3")
-![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/screenshots/image5.png "Game Over")
-![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/screenshots/image6.png "High Scores")
+![ScreenShot](https://raw.github.com/vitorshade/asteroids-unity3d/master/screenshots/image4.png "High Scores")
 
