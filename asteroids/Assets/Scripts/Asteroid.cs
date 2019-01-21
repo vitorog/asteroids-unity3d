@@ -81,10 +81,10 @@ public class Asteroid : MonoBehaviour
         {
             GameObject child_asteroid_1 = (GameObject)Instantiate(asteroid_prefab_, transform.position, Quaternion.identity);
             child_asteroid_1.GetComponent<Asteroid>().SetAsteroidSize(size_ - 1);
-            child_asteroid_1.rigidbody2D.velocity = Quaternion.Euler(0, 0, -30) * rigidbody2D.velocity;
+            child_asteroid_1.GetComponent<Rigidbody2D>().velocity = Quaternion.Euler(0, 0, -30) * GetComponent<Rigidbody2D>().velocity;
             GameObject child_asteroid_2 = (GameObject)Instantiate(asteroid_prefab_, transform.position, Quaternion.identity);
             child_asteroid_2.GetComponent<Asteroid>().SetAsteroidSize(size_ - 1);
-            child_asteroid_2.rigidbody2D.velocity = Quaternion.Euler(0, 0, 30) * rigidbody2D.velocity;
+            child_asteroid_2.GetComponent<Rigidbody2D>().velocity = Quaternion.Euler(0, 0, 30) * GetComponent<Rigidbody2D>().velocity;
 
 
         }     

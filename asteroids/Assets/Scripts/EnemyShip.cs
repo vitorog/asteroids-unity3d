@@ -87,7 +87,7 @@ public class EnemyShip : MonoBehaviour
 
         float projectile_precision = Random.Range(min_angle_, max_angle_);                
         dir = Quaternion.Euler(0.0f, 0.0f, projectile_precision) * dir;
-        p.rigidbody2D.velocity = dir * projectile_speed_ * Time.deltaTime;
+        p.GetComponent<Rigidbody2D>().velocity = dir * projectile_speed_ * Time.deltaTime;
         p.GetComponent<Projectile>().max_time_alive_ = 3.0f;
 
         gameObject.GetComponents<AudioSource>()[0].Play();        

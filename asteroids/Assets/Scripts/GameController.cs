@@ -94,14 +94,14 @@ public class GameController : MonoBehaviour
         GameObject info_text_object = new GameObject("InfoText");
         info_text_ = info_text_object.AddComponent<GUIText>();
         info_text_.gameObject.transform.position = new Vector3(0.5f, 0.9f, 0.0f);
-        info_text_.guiText.alignment = TextAlignment.Center;
-        info_text_.guiText.anchor = TextAnchor.MiddleCenter;
+        info_text_.GetComponent<GUIText>().alignment = TextAlignment.Center;
+        info_text_.GetComponent<GUIText>().anchor = TextAnchor.MiddleCenter;
 
         GameObject max_score_object = new GameObject("MaxScore");
         max_score_text_ = max_score_object.AddComponent<GUIText>();
         max_score_text_.gameObject.transform.position = new Vector3(0.5f, 0.95f, 0.0f);
-        max_score_text_.guiText.alignment = TextAlignment.Center;
-        max_score_text_.guiText.anchor = TextAnchor.MiddleCenter;
+        max_score_text_.GetComponent<GUIText>().alignment = TextAlignment.Center;
+        max_score_text_.GetComponent<GUIText>().anchor = TextAnchor.MiddleCenter;
         max_score_text_.text = "0";
 
         current_state_ = GAME_STATE.MAIN_MENU;
@@ -234,19 +234,19 @@ public class GameController : MonoBehaviour
 
         Asteroid asteroid = (Asteroid)GameObject.Instantiate(asteroid_prefab_, position, Quaternion.identity);
         float asteroid_speed = Random.Range(1, 11);
-        asteroid.rigidbody2D.velocity = direction * asteroid_speed * Time.deltaTime;
+        asteroid.GetComponent<Rigidbody2D>().velocity = direction * asteroid_speed * Time.deltaTime;
 
-        if (asteroid.rigidbody2D.velocity.magnitude > max_asteroid_speed_)
+        if (asteroid.GetComponent<Rigidbody2D>().velocity.magnitude > max_asteroid_speed_)
         {
-            asteroid.rigidbody2D.velocity = asteroid.rigidbody2D.velocity.normalized * max_asteroid_speed_;
+            asteroid.GetComponent<Rigidbody2D>().velocity = asteroid.GetComponent<Rigidbody2D>().velocity.normalized * max_asteroid_speed_;
         }
-        if (asteroid.rigidbody2D.velocity.magnitude < min_asteroid_speed_)
+        if (asteroid.GetComponent<Rigidbody2D>().velocity.magnitude < min_asteroid_speed_)
         {
-            asteroid.rigidbody2D.velocity = asteroid.rigidbody2D.velocity.normalized * ((max_asteroid_speed_ + min_asteroid_speed_) / 2.0f);
+            asteroid.GetComponent<Rigidbody2D>().velocity = asteroid.GetComponent<Rigidbody2D>().velocity.normalized * ((max_asteroid_speed_ + min_asteroid_speed_) / 2.0f);
         }
 
         float torque = Random.Range(min_asteroid_torque_, max_asteroid_torque_);
-        asteroid.rigidbody2D.AddTorque(torque);
+        asteroid.GetComponent<Rigidbody2D>().AddTorque(torque);
     }
 
     void GenerateUFO()
@@ -271,7 +271,7 @@ public class GameController : MonoBehaviour
             ufo.GetComponent<EnemyShip>().projectile_speed_ = ufo_projectile_speed_;
             ufo.GetComponent<EnemyShip>().shooting_delay_ = ufo_shooting_delay_;
             float ufo_speed = Random.Range(min_ufo_speed_, max_ufo_speed_);
-            ufo.rigidbody2D.velocity = direction * (ufo_speed * 50) * Time.deltaTime;
+            ufo.GetComponent<Rigidbody2D>().velocity = direction * (ufo_speed * 50) * Time.deltaTime;
             num_generated_ufos_++;
         }
     }

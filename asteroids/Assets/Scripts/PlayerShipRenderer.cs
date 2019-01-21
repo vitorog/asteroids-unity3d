@@ -56,13 +56,7 @@ public class PlayerShipRenderer : MonoBehaviour
     {
         if (!line_material_)
         {
-            line_material_ = new Material("Shader \"Lines/Colored Blended\" {" +
-                    "SubShader { Pass { " +
-                    "    Blend SrcAlpha OneMinusSrcAlpha " +
-                    "    ZWrite Off Cull Off Fog { Mode Off } " +
-                    "    BindChannels {" +
-                    "      Bind \"vertex\", vertex Bind \"color\", color }" +
-                    "} } }");
+            line_material_ = new Material(Shader.Find("Lines/Colored Blended"));
             line_material_.hideFlags = HideFlags.HideAndDontSave;
             line_material_.shader.hideFlags = HideFlags.HideAndDontSave;
         }
@@ -138,17 +132,17 @@ public class PlayerShipRenderer : MonoBehaviour
 
         GL.Color(square_color_);
         GL.Begin(GL.LINES);
-        GL.Vertex3(bc.center.x - bc.size.x / 2.0f, bc.center.y - bc.size.y / 2.0f, 0.0f);
-        GL.Vertex3(bc.center.x + bc.size.x / 2.0f, bc.center.y - bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.offset.x - bc.size.x / 2.0f, bc.offset.y - bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.offset.x + bc.size.x / 2.0f, bc.offset.y - bc.size.y / 2.0f, 0.0f);
 
-        GL.Vertex3(bc.center.x + bc.size.x / 2.0f, bc.center.y - bc.size.y / 2.0f, 0.0f);
-        GL.Vertex3(bc.center.x + bc.size.x / 2.0f, bc.center.y + bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.offset.x + bc.size.x / 2.0f, bc.offset.y - bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.offset.x + bc.size.x / 2.0f, bc.offset.y + bc.size.y / 2.0f, 0.0f);
 
-        GL.Vertex3(bc.center.x + bc.size.x / 2.0f, bc.center.y + bc.size.y / 2.0f, 0.0f);
-        GL.Vertex3(bc.center.x - bc.size.x / 2.0f, bc.center.y + bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.offset.x + bc.size.x / 2.0f, bc.offset.y + bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.offset.x - bc.size.x / 2.0f, bc.offset.y + bc.size.y / 2.0f, 0.0f);
 
-        GL.Vertex3(bc.center.x - bc.size.x / 2.0f, bc.center.y + bc.size.y / 2.0f, 0.0f);
-        GL.Vertex3(bc.center.x - bc.size.x / 2.0f, bc.center.y - bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.offset.x - bc.size.x / 2.0f, bc.offset.y + bc.size.y / 2.0f, 0.0f);
+        GL.Vertex3(bc.offset.x - bc.size.x / 2.0f, bc.offset.y - bc.size.y / 2.0f, 0.0f);
 
         GL.End();
     }

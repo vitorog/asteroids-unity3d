@@ -60,10 +60,10 @@ public class HighScoresController : MonoBehaviour {
                 gui_letters_.Add(letter);
                 letters_.Add('A');
             }
-            info_text_.guiText.text = "YOU BEAT A HIGH SCORE! ENTER YOUR INITIALS! (PRESS SPACE TO CONFIRM)";
+            info_text_.GetComponent<GUIText>().text = "YOU BEAT A HIGH SCORE! ENTER YOUR INITIALS! (PRESS SPACE TO CONFIRM)";
             for (int i = 0; i < num_letters_; i++)
             {
-                gui_letters_[i].guiText.enabled = true;
+                gui_letters_[i].GetComponent<GUIText>().enabled = true;
             }
             InvokeRepeating("BlinkLetter", 0.25f, 0.25f);
             current_state_ = HIGH_SCORES_STATE.INITIALS_INPUT;            
@@ -102,7 +102,7 @@ public class HighScoresController : MonoBehaviour {
         {
             for (int i = 0; i < num_letters_; i++)
             {
-                gui_letters_[i].guiText.enabled = true;
+                gui_letters_[i].GetComponent<GUIText>().enabled = true;
             }
             letter_index_++;
             if (letter_index_ >= num_letters_)
@@ -114,7 +114,7 @@ public class HighScoresController : MonoBehaviour {
         {
             for (int i = 0; i < num_letters_; i++)
             {
-                gui_letters_[i].guiText.enabled = true;
+                gui_letters_[i].GetComponent<GUIText>().enabled = true;
             }
             letter_index_--;
             if (letter_index_ < 0)
@@ -129,7 +129,7 @@ public class HighScoresController : MonoBehaviour {
             {
                 letters_[letter_index_] = (char)65;
             }
-            gui_letters_[letter_index_].guiText.text = letters_[letter_index_].ToString();
+            gui_letters_[letter_index_].GetComponent<GUIText>().text = letters_[letter_index_].ToString();
         }
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {            
@@ -138,7 +138,7 @@ public class HighScoresController : MonoBehaviour {
             {
                 letters_[letter_index_] = (char)90;
             }
-            gui_letters_[letter_index_].guiText.text = letters_[letter_index_].ToString();
+            gui_letters_[letter_index_].GetComponent<GUIText>().text = letters_[letter_index_].ToString();
         }
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -196,7 +196,7 @@ public class HighScoresController : MonoBehaviour {
             text+=high_scores_[i].ToString();
             text += "\n";
         }
-        info_text_.guiText.text = text;
+        info_text_.GetComponent<GUIText>().text = text;
         if (Input.GetKeyDown(KeyCode.Space))
         {
             done_ = true;
@@ -205,6 +205,6 @@ public class HighScoresController : MonoBehaviour {
 
     void BlinkLetter()
     {
-        gui_letters_[letter_index_].gameObject.guiText.enabled = !gui_letters_[letter_index_].gameObject.guiText.enabled;
+        gui_letters_[letter_index_].gameObject.GetComponent<GUIText>().enabled = !gui_letters_[letter_index_].gameObject.GetComponent<GUIText>().enabled;
     }
 }

@@ -137,7 +137,7 @@ public class PlayerShip : MonoBehaviour
     {        
         GameObject hyperspace_anim = (GameObject)Instantiate(hyperspace_anim_prefab_, transform.position, transform.rotation);
         hyperspace_anim.GetComponent<HyperspaceAnim>().Init(0);
-        gameObject.rigidbody2D.velocity = Vector3.zero;
+        gameObject.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
         float x = Random.Range(0.0f, 1.0f);
         float y = Random.Range(0.0f, 1.0f);
         Vector3 pos = Camera.main.ViewportToWorldPoint(new Vector3(x, y, 0.0f));
@@ -157,7 +157,7 @@ public class PlayerShip : MonoBehaviour
         if (GameObject.FindGameObjectsWithTag("PlayerProjectile").Length < max_projectiles_number_)
         {
             Projectile p = (Projectile)GameObject.Instantiate(projectile_, transform.position, transform.rotation);
-            p.rigidbody2D.velocity = transform.up * projectile_speed_ * Time.deltaTime;
+            p.GetComponent<Rigidbody2D>().velocity = transform.up * projectile_speed_ * Time.deltaTime;
 
             gameObject.GetComponents<AudioSource>()[0].Play();
             
